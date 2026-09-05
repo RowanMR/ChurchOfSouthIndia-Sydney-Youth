@@ -2,13 +2,936 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI Sydney Youth Web Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CSI SYDNEY YOUTH | Cinematic Experience</title>
+    <meta name="description" content="An immersive cinematic Christian digital experience for CSI Sydney Youth.">
+    
+    <!-- LIBRARIES (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+
+    <!-- TYPOGRAPHY -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Oswald:wght@200;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           DESIGN TOKENS & GLOBAL CSS
+           ============================================================ */
+        :root {
+            --color-black: #050505;
+            --color-white: #f8f8f8;
+            --color-accent: #e2c08d;
+            --color-dark-grey: #1a1a1a;
+            
+            --font-cinematic: 'Cinzel', serif;
+            --font-massive: 'Oswald', sans-serif;
+            --font-ui: 'Inter', sans-serif;
+            
+            --z-bg: 0;
+            --z-webgl: 1;
+            --z-content: 10;
+            --z-ui: 100;
+            --z-cursor: 9999;
+            --z-loader: 10000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor */
+        }
+
+        html, body {
+            width: 100%;
+            background-color: var(--color-black);
+            color: var(--color-white);
+            font-family: var(--font-ui);
+            overscroll-behavior: none;
+            overflow-x: hidden;
+        }
+
+        /* Lenis Smooth Scroll */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+
+        /* Typography Utilities */
+        .text-massive {
+            font-family: var(--font-massive);
+            font-size: clamp(6rem, 15vw, 25rem);
+            font-weight: 700;
+            line-height: 0.8;
+            text-transform: uppercase;
+        }
+        
+        .text-cinematic {
+            font-family: var(--font-cinematic);
+            font-size: clamp(2rem, 5vw, 8rem);
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .text-ui {
+            font-family: var(--font-ui);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+           CURSOR
+           ============================================================ */
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0; left: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: var(--z-cursor);
+            transform: translate(-50%, -50%);
+        }
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--color-white);
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: width 0.3s, height 0.3s, background-color 0.3s, mix-blend-mode 0.3s;
+        }
+        .cursor-outline.hover {
+            width: 80px;
+            height: 80px;
+            background-color: var(--color-white);
+            mix-blend-mode: difference;
+            border: none;
+        }
+        .cursor-outline.drag {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--color-white);
+        }
+
+        /* ============================================================
+           LOADER
+           ============================================================ */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--color-black);
+            z-index: var(--z-loader);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader-text {
+            overflow: hidden;
+        }
+        .loader-text span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+        .loader-progress {
+            margin-top: 2rem;
+            width: 200px;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+        }
+        .loader-bar {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            background: var(--color-white);
+            width: 0%;
+        }
+
+        /* ============================================================
+           NAVIGATION & UI
+           ============================================================ */
+        nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: var(--z-ui);
+            mix-blend-mode: difference;
+        }
+        .nav-logo { font-weight: 700; letter-spacing: 0.1em; }
+        .nav-menu { display: flex; gap: 2rem; }
+        .nav-link { position: relative; padding: 0.5rem; overflow: hidden; }
+        .nav-link::after {
+            content: ''; position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 1px;
+            background: var(--color-white);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .nav-link:hover::after { transform: translateX(0); }
+
+        /* ============================================================
+           WEBGL CANVAS
+           ============================================================ */
+        #webgl-container {
+            position: fixed;
+            inset: 0;
+            z-index: var(--z-webgl);
+            pointer-events: none;
+            opacity: 0.6; /* Atmosphere */
+        }
+
+        /* ============================================================
+           SCENE ARCHITECTURE
+           ============================================================ */
+        main {
+            position: relative;
+            z-index: var(--z-content);
+        }
+        .scene {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .scene-pinned {
+            height: 100vh;
+        }
+        
+        /* SCENE 01: OPENING */
+        #scene-opening {
+            background: var(--color-black);
+        }
+        .opening-title {
+            position: absolute;
+            white-space: nowrap;
+            mix-blend-mode: difference;
+            z-index: 2;
+        }
+        .opening-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transform: scale(1.2);
+        }
+
+        /* SCENE 02: THE CHRIST / OMEGA */
+        #scene-omega {
+            background: var(--color-black);
+        }
+        .omega-image-wrapper {
+            position: absolute;
+            width: 50vw;
+            height: 70vh;
+            overflow: hidden;
+            clip-path: inset(100% 0 0 0);
+        }
+        .omega-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.5);
+            /* Concept from prompt references: Majestic bright lighting, Jesus imagery */
+            background-image: url('https://images.unsplash.com/photo-1544078869-7080b06b9b1e?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .omega-text-container {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+        .omega-letter {
+            display: inline-block;
+            transform: translateY(100vh);
+            opacity: 0;
+        }
+
+        /* SCENE 03: COMMUNITY HORIZONTAL */
+        #scene-community {
+            height: 100vh;
+            width: 400vw; /* 4 screens wide */
+            display: flex;
+            flex-direction: row;
+            background: var(--color-white);
+            color: var(--color-black);
+        }
+        .community-panel {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 5vw;
+        }
+        .comm-img {
+            width: 60%;
+            height: 80%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transform-origin: center;
+        }
+        .comm-text {
+            position: absolute;
+            left: 10vw;
+            bottom: 15vh;
+            mix-blend-mode: difference;
+            color: var(--color-white); /* Difference makes it black on white */
+        }
+
+        /* SCENE 04: SYDNEY / ENVIRONMENT */
+        #scene-sydney {
+            background: var(--color-black);
+        }
+        .sydney-wrapper {
+            position: absolute;
+            inset: 0;
+            clip-path: circle(0% at 50% 50%);
+        }
+        .sydney-bg {
+            width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4);
+        }
+        .sydney-typography {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* SCENE 05: EVENTS / GATHERINGS (3D) */
+        #scene-events {
+            perspective: 1000px;
+            background: var(--color-dark-grey);
+        }
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10vh;
+            transform-style: preserve-3d;
+        }
+        .event-item {
+            font-size: clamp(3rem, 8vw, 10rem);
+            font-family: var(--font-massive);
+            opacity: 0.1;
+            transform: translateZ(-500px) rotateX(20deg);
+            transition: opacity 0.3s;
+        }
+        .event-item.active {
+            opacity: 1;
+            color: var(--color-accent);
+        }
+        
+        /* SCENE 06: FINALE / INVITATION */
+        #scene-finale {
+            background: var(--color-black);
+        }
+        .finale-light {
+            position: absolute;
+            width: 2vw; height: 2vw;
+            background: var(--color-white);
+            border-radius: 50%;
+            box-shadow: 0 0 100px 50px rgba(255,255,255,0.8);
+            opacity: 0;
+        }
+        .btn-magnetic {
+            padding: 1.5rem 4rem;
+            border: 1px solid var(--color-white);
+            border-radius: 50px;
+            background: transparent;
+            color: var(--color-white);
+            font-family: var(--font-ui);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        .btn-magnetic::before {
+            content: '';
+            position: absolute;
+            top: 100%; left: 0; width: 100%; height: 100%;
+            background: var(--color-white);
+            transition: top 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+            z-index: -1;
+        }
+        .btn-magnetic:hover::before { top: 0; }
+        .btn-magnetic:hover { color: var(--color-black); }
+
+        /* Accessibility / Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+            .cursor-dot, .cursor-outline, #webgl-container { display: none !important; }
+            body { cursor: auto; }
+        }
+        
+        /* Mobile Specifics */
+        @media (max-width: 768px) {
+            .nav-menu { display: none; } /* Simplified for mobile demo */
+            .omega-image-wrapper { width: 90vw; }
+            #scene-community { flex-direction: column; width: 100vw; height: 400vh; }
+            .community-panel { height: 100vh; }
+            .comm-img { width: 90%; height: 60%; }
+            .text-massive { font-size: 25vw; }
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Welcome to CSI Sydney Youth</h1>
-    <p>This is where the main content goes.</p>
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="text-cinematic loader-text">
+            <span>AWAKEN</span>
+        </div>
+        <div class="loader-progress">
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- WEBGL BACKGROUND (Atmosphere/Particles) -->
+    <div id="webgl-container"></div>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="nav-logo text-ui hover-target">CSI SYDNEY YOUTH</div>
+        <div class="nav-menu text-ui">
+            <div class="nav-link hover-target">Vision</div>
+            <div class="nav-link hover-target">Community</div>
+            <div class="nav-link hover-target">Gatherings</div>
+        </div>
+    </nav>
+
+    <!-- MAIN SCROLL CONTAINER -->
+    <main id="smooth-wrapper">
+        <div id="smooth-content">
+
+            <!-- SCENE 01: THE OPENING -->
+            <section id="scene-opening" class="scene scene-pinned">
+                <div class="opening-bg"></div>
+                <h1 class="text-massive opening-title">
+                    <span class="ot-word">CSI</span>
+                    <span class="ot-word">SYDNEY</span>
+                </h1>
+            </section>
+
+            <!-- SCENE 02: THE OMEGA (CHRIST FOCUSED) -->
+            <section id="scene-omega" class="scene scene-pinned">
+                <div class="omega-image-wrapper">
+                    <div class="omega-image"></div>
+                </div>
+                <div class="omega-text-container text-massive">
+                    <!-- Referencing "OMEGA" from image inspiration -->
+                    <span class="omega-letter">O</span>
+                    <span class="omega-letter">M</span>
+                    <span class="omega-letter">E</span>
+                    <span class="omega-letter">G</span>
+                    <span class="omega-letter">A</span>
+                </div>
+                <div class="text-cinematic" style="position:absolute; bottom: 10vh; opacity:0;" id="omega-sub">
+                    The Beginning and The End
+                </div>
+            </section>
+
+            <!-- SCENE 03: COMMUNITY (HORIZONTAL CINEMATOGRAPHY) -->
+            <div class="horizontal-scroll-wrapper" style="overflow: hidden;">
+                <section id="scene-community">
+                    <div class="community-panel">
+                        <img src="https://images.unsplash.com/photo-1511632765486-a01c80cb2628?auto=format&fit=crop&q=80" alt="Youth Gathered" class="comm-img hover-target">
+                        <h2 class="text-massive comm-text">FELLOWSHIP</h2>
+                    </div>
+                    <div class="community-panel">
+                        <img src="https://images.unsplash.com/photo-1529156069898-49953eb1b5b6?auto=format&fit=crop&q=80" alt="Hands raised" class="comm-img hover-target">
+                        <h2 class="text-massive comm-text">WORSHIP</h2>
+                    </div>
+                    <div class="community-panel">
+                        <img src="https://images.unsplash.com/photo-1527525443983-6e60c75fff46?auto=format&fit=crop&q=80" alt="Group smiling" class="comm-img hover-target">
+                        <h2 class="text-massive comm-text">FAMILY</h2>
+                    </div>
+                    <div class="community-panel" style="background: var(--color-black); color: var(--color-white);">
+                        <div class="text-cinematic text-center" style="mix-blend-mode: normal; color: white;">
+                            More than a crowd.<br>A generation.
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- SCENE 04: SYDNEY / URBAN TRANSITION -->
+            <section id="scene-sydney" class="scene scene-pinned">
+                <div class="sydney-wrapper">
+                    <div class="sydney-bg"></div>
+                </div>
+                <div class="sydney-typography">
+                    <h2 class="text-cinematic syd-text-1" style="opacity:0;">CALLED IN</h2>
+                    <h1 class="text-massive syd-text-2" style="opacity:0; color: var(--color-accent);">SYDNEY</h1>
+                </div>
+            </section>
+
+            <!-- SCENE 05: EVENTS (3D SCROLL) -->
+            <section id="scene-events" class="scene scene-pinned">
+                <div class="event-list">
+                    <div class="event-item">FRIDAY YOUTH</div>
+                    <div class="event-item">SUMMER CAMP</div>
+                    <div class="event-item">WORSHIP NIGHT</div>
+                    <div class="event-item">SUNDAY GATHERING</div>
+                </div>
+            </section>
+
+            <!-- SCENE 06: FINALE -->
+            <section id="scene-finale" class="scene scene-pinned">
+                <div class="finale-light"></div>
+                <div class="finale-content" style="text-align: center; z-index: 10; opacity: 0; transform: translateY(50px);">
+                    <h2 class="text-cinematic" style="margin-bottom: 2rem;">STEP INTO THE STORY</h2>
+                    <button class="btn-magnetic hover-target">Join Us</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ============================================================
+         JAVASCRIPT ARCHITECTURE
+         ============================================================ -->
+    <script>
+        // ------------------------------------------------------------
+        // 1. UTILITIES & REGISTRATION
+        // ------------------------------------------------------------
+        gsap.registerPlugin(ScrollTrigger);
+
+        const isMobile = window.innerWidth <= 768;
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ------------------------------------------------------------
+        // 2. PERFORMANCE & FALLBACK MANAGER
+        // ------------------------------------------------------------
+        class PerformanceManager {
+            constructor() {
+                this.dpr = Math.min(window.devicePixelRatio, 2); // Cap pixel ratio
+                this.quality = isMobile ? 'low' : 'high';
+            }
+        }
+        const Perf = new PerformanceManager();
+
+        // ------------------------------------------------------------
+        // 3. SMOOTH SCROLL (LENIS)
+        // ------------------------------------------------------------
+        class ScrollDirector {
+            constructor() {
+                if (prefersReducedMotion) return;
+                
+                this.lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                });
+
+                this.lenis.on('scroll', ScrollTrigger.update);
+
+                gsap.ticker.add((time) => {
+                    this.lenis.raf(time * 1000);
+                });
+                gsap.ticker.lagSmoothing(0);
+            }
+        }
+        const Scroll = new ScrollDirector();
+
+        // ------------------------------------------------------------
+        // 4. CURSOR & MAGNETIC SYSTEM
+        // ------------------------------------------------------------
+        class InteractionSystem {
+            constructor() {
+                if (isMobile || prefersReducedMotion) return;
+                
+                this.cursor = {
+                    dot: document.querySelector('.cursor-dot'),
+                    outline: document.querySelector('.cursor-outline'),
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    dotX: window.innerWidth / 2,
+                    dotY: window.innerHeight / 2,
+                    outX: window.innerWidth / 2,
+                    outY: window.innerHeight / 2,
+                };
+                
+                this.targets = document.querySelectorAll('.hover-target');
+                this.initEvents();
+                this.render();
+            }
+
+            initEvents() {
+                window.addEventListener('mousemove', (e) => {
+                    this.cursor.x = e.clientX;
+                    this.cursor.y = e.clientY;
+                });
+
+                this.targets.forEach(target => {
+                    target.addEventListener('mouseenter', () => this.cursor.outline.classList.add('hover'));
+                    target.addEventListener('mouseleave', () => this.cursor.outline.classList.remove('hover'));
+                });
+
+                // Magnetic Buttons
+                const magnetics = document.querySelectorAll('.btn-magnetic');
+                magnetics.forEach(btn => {
+                    btn.addEventListener('mousemove', (e) => {
+                        const rect = btn.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width / 2;
+                        const y = e.clientY - rect.top - rect.height / 2;
+                        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power2.out" });
+                    });
+                    btn.addEventListener('mouseleave', () => {
+                        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                    });
+                });
+            }
+
+            render() {
+                // Linear interpolation for smooth trailing
+                this.cursor.dotX += (this.cursor.x - this.cursor.dotX) * 0.5;
+                this.cursor.dotY += (this.cursor.y - this.cursor.dotY) * 0.5;
+                this.cursor.outX += (this.cursor.x - this.cursor.outX) * 0.15;
+                this.cursor.outY += (this.cursor.y - this.cursor.outY) * 0.15;
+
+                this.cursor.dot.style.transform = `translate(${this.cursor.dotX}px, ${this.cursor.dotY}px)`;
+                this.cursor.outline.style.transform = `translate(${this.cursor.outX}px, ${this.cursor.outY}px)`;
+
+                requestAnimationFrame(() => this.render());
+            }
+        }
+
+        // ------------------------------------------------------------
+        // 5. WEBGL ENVIRONMENT (THREE.JS) - ATMOSPHERE/PARTICLES
+        // ------------------------------------------------------------
+        class WebGLEngine {
+            constructor() {
+                if (prefersReducedMotion) return;
+
+                this.container = document.getElementById('webgl-container');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: Perf.quality === 'high' });
+                
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Perf.dpr);
+                this.container.appendChild(this.renderer.domElement);
+
+                this.camera.position.z = 50;
+                
+                this.particles = null;
+                this.scrollVelocity = 0;
+                this.lastScrollY = window.scrollY;
+
+                this.initParticles();
+                this.bindEvents();
+                this.animate();
+            }
+
+            initParticles() {
+                const count = Perf.quality === 'high' ? 3000 : 1000;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(count * 3);
+                
+                for(let i = 0; i < count * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 200;
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                // Shader Material for glowing dust effect
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        color: { value: new THREE.Color(0xe2c08d) }
+                    },
+                    vertexShader: `
+                        uniform float time;
+                        varying vec2 vUv;
+                        void main() {
+                            vec3 pos = position;
+                            pos.y += sin(time * 0.5 + pos.x * 0.1) * 2.0;
+                            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                            gl_PointSize = (100.0 / -mvPosition.z);
+                            gl_Position = projectionMatrix * mvPosition;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 color;
+                        void main() {
+                            float dist = length(gl_PointCoord - vec2(0.5));
+                            if (dist > 0.5) discard;
+                            float alpha = smoothstep(0.5, 0.1, dist);
+                            gl_FragColor = vec4(color, alpha * 0.5);
+                        }
+                    `,
+                    transparent: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                this.particles = new THREE.Points(geometry, material);
+                this.scene.add(this.particles);
+            }
+
+            bindEvents() {
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            animate(time = 0) {
+                requestAnimationFrame((t) => this.animate(t));
+                
+                // Calculate scroll velocity for particle distortion
+                const currentScroll = window.scrollY;
+                this.scrollVelocity = currentScroll - this.lastScrollY;
+                this.lastScrollY = currentScroll;
+
+                if (this.particles) {
+                    this.particles.material.uniforms.time.value = time * 0.001;
+                    this.particles.rotation.y += 0.001;
+                    // React to scroll
+                    this.particles.position.y += this.scrollVelocity * 0.02;
+                    // Recenter gently
+                    this.particles.position.y += (0 - this.particles.position.y) * 0.05;
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // ------------------------------------------------------------
+        // 6. CINEMATIC SCENE MANAGER (GSAP TIMELINES)
+        // ------------------------------------------------------------
+        class SceneManager {
+            constructor() {
+                this.buildOpeningScene();
+                this.buildOmegaScene();
+                if (!isMobile) this.buildCommunityScene(); // Horizontal logic
+                this.buildSydneyScene();
+                this.buildEventsScene();
+                this.buildFinaleScene();
+            }
+
+            // SCENE 1: OPENING (Scale out, Fade in background)
+            buildOpeningScene() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scene-opening',
+                        start: 'top top',
+                        end: '+=150%',
+                        scrub: true,
+                        pin: true,
+                    }
+                });
+
+                // Bidirectional: Background appears, Text splits and scales hugely
+                tl.to('.opening-bg', { opacity: 0.6, scale: 1, duration: 2, ease: "power2.inOut" })
+                  .to('.ot-word:nth-child(1)', { x: '-50vw', opacity: 0, scale: 5, duration: 2, ease: "power2.inOut" }, "<")
+                  .to('.ot-word:nth-child(2)', { x: '50vw', opacity: 0, scale: 5, duration: 2, ease: "power2.inOut" }, "<");
+            }
+
+            // SCENE 2: OMEGA / CHRIST (Image Reveal & Typography Mask)
+            buildOmegaScene() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scene-omega',
+                        start: 'top top',
+                        end: '+=200%',
+                        scrub: true,
+                        pin: true,
+                    }
+                });
+
+                // 1. Reveal image like a rising curtain
+                tl.to('.omega-image-wrapper', { clipPath: 'inset(0% 0% 0% 0%)', duration: 2, ease: "power3.inOut" })
+                  .to('.omega-image', { scale: 1, duration: 2, ease: "power3.inOut" }, "<")
+                  
+                  // 2. Letters of OMEGA rise from bottom sequentially
+                  .to('.omega-letter', { y: 0, opacity: 1, duration: 1.5, stagger: 0.2, ease: "power4.out" })
+                  
+                  // 3. Scale the OMEGA word massive while image zooms out slightly
+                  .to('.omega-text-container', { scale: 5, opacity: 0, duration: 2, ease: "power2.inOut" }, "+=0.5")
+                  .to('.omega-image', { scale: 1.2, filter: 'blur(10px)', duration: 2, ease: "power2.inOut" }, "<")
+                  
+                  // 4. Final text fade in
+                  .to('#omega-sub', { opacity: 1, y: -50, duration: 1 });
+            }
+
+            // SCENE 3: COMMUNITY (Horizontal Scroll - Desktop Only logic)
+            buildCommunityScene() {
+                const wrapper = document.querySelector('.horizontal-scroll-wrapper');
+                const section = document.querySelector('#scene-community');
+                
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: wrapper,
+                        start: 'top top',
+                        end: () => `+=${section.offsetWidth - window.innerWidth}`,
+                        scrub: true,
+                        pin: true,
+                        anticipatePin: 1
+                    }
+                });
+
+                // Move container left
+                tl.to(section, {
+                    x: () => -(section.offsetWidth - window.innerWidth),
+                    ease: "none"
+                });
+
+                // Add parallax to images inside the panels as they scroll horizontally
+                const images = gsap.utils.toArray('.comm-img');
+                images.forEach(img => {
+                    gsap.to(img, {
+                        x: 100,
+                        scale: 1.1,
+                        filter: 'grayscale(0%)',
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: img.parentElement,
+                            containerAnimation: tl,
+                            start: "left right",
+                            end: "right left",
+                            scrub: true
+                        }
+                    });
+                });
+            }
+
+            // SCENE 4: SYDNEY URBAN TRANSITION
+            buildSydneyScene() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scene-sydney',
+                        start: 'top top',
+                        end: '+=150%',
+                        scrub: true,
+                        pin: true,
+                    }
+                });
+
+                // Circular mask reveal of the city
+                tl.to('.sydney-wrapper', { clipPath: 'circle(150% at 50% 50%)', duration: 2, ease: "power2.inOut" })
+                  .to('.sydney-bg', { filter: 'brightness(1)', scale: 1.1, duration: 2 }, "<")
+                  .to('.syd-text-1', { opacity: 1, y: -20, duration: 1 })
+                  .to('.syd-text-2', { opacity: 1, scale: 1.2, duration: 1.5, ease: "back.out(1.7)" }, "-=0.5");
+            }
+
+            // SCENE 5: EVENTS (3D Depth Typography)
+            buildEventsScene() {
+                const items = gsap.utils.toArray('.event-item');
+                
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scene-events',
+                        start: 'top top',
+                        end: '+=200%',
+                        scrub: true,
+                        pin: true,
+                    }
+                });
+
+                items.forEach((item, i) => {
+                    tl.to(item, {
+                        z: 200, 
+                        rotateX: 0,
+                        opacity: 1,
+                        color: '#e2c08d',
+                        duration: 1,
+                        ease: "power2.out"
+                    })
+                    .to(item, {
+                        z: 800,
+                        opacity: 0,
+                        duration: 1,
+                        ease: "power2.in"
+                    });
+                });
+            }
+
+            // SCENE 6: FINALE CLIMAX
+            buildFinaleScene() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scene-finale',
+                        start: 'top top',
+                        end: '+=100%',
+                        scrub: true,
+                        pin: true,
+                    }
+                });
+
+                // Blinding light expanding
+                tl.to('.finale-light', { scale: 50, opacity: 1, duration: 2, ease: "power4.inOut" })
+                  // Content appears out of the light (using difference blend or just fading)
+                  .to('.finale-content', { opacity: 1, y: 0, duration: 1 }, "-=0.5")
+                  // Background goes white
+                  .to('#scene-finale', { backgroundColor: '#f8f8f8', color: '#050505', duration: 0.1 }, "-=1")
+                  .to('.btn-magnetic', { borderColor: '#050505', color: '#050505', duration: 0.1 }, "<");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // 7. INITIALISATION & LOADING
+        // ------------------------------------------------------------
+        window.addEventListener('load', () => {
+            // Loader Animation
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.getElementById('loader').style.display = 'none';
+                    initApp();
+                }
+            });
+
+            tl.to('.loader-text span', { y: 0, duration: 1, ease: "power4.out" })
+              .to('.loader-bar', { width: '100%', duration: 1.5, ease: "power2.inOut" })
+              .to('#loader', { yPercent: -100, duration: 1, ease: "power4.inOut", delay: 0.2 });
+        });
+
+        function initApp() {
+            new InteractionSystem();
+            new WebGLEngine();
+            new SceneManager();
+            
+            // Force ScrollTrigger refresh after setup
+            ScrollTrigger.refresh();
+        }
+
+    </script>
 </body>
 </html>
