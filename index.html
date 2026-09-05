@@ -15,515 +15,463 @@
     <!-- TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Oswald:wght@200;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Cinzel: Cinematic Serif, Oswald: Massive Impact, Inter: UI/Credits -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;700&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
 
     <style>
         /* ============================================================
-           DESIGN TOKENS & GLOBAL CSS
+           DIRECTOR'S CUT: GLOBAL VARIABLES & TOKENS
            ============================================================ */
         :root {
-            --color-black: #050505;
-            --color-white: #f8f8f8;
-            --color-accent: #e2c08d;
-            --color-dark-grey: #1a1a1a;
+            --c-void: #020202;
+            --c-light: #fdfdfd;
+            --c-gold: #cfa870;
+            --c-blood: #8a1c1c;
+            --c-concrete: #111111;
             
-            --font-cinematic: 'Cinzel', serif;
-            --font-massive: 'Oswald', sans-serif;
-            --font-ui: 'Inter', sans-serif;
+            --f-cinematic: 'Cinzel', serif;
+            --f-massive: 'Oswald', sans-serif;
+            --f-ui: 'Inter', sans-serif;
             
             --z-bg: 0;
-            --z-webgl: 1;
-            --z-content: 10;
+            --z-webgl: 5;
+            --z-film: 10;
             --z-ui: 100;
+            --z-curtain: 9000;
             --z-cursor: 9999;
-            --z-loader: 10000;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            cursor: none; /* Custom cursor */
+        /* ============================================================
+           BASE RESET & ACCESSIBILITY
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box; cursor: none;
         }
 
         html, body {
-            width: 100%;
-            background-color: var(--color-black);
-            color: var(--color-white);
-            font-family: var(--font-ui);
+            width: 100%; min-height: 100vh;
+            background-color: var(--c-void);
+            color: var(--c-light);
+            font-family: var(--f-ui);
             overscroll-behavior: none;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Lenis Smooth Scroll */
+        /* Lenis Smooth Scroll Engine */
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
         .lenis.lenis-stopped { overflow: hidden; }
 
-        /* Typography Utilities */
-        .text-massive {
-            font-family: var(--font-massive);
-            font-size: clamp(6rem, 15vw, 25rem);
-            font-weight: 700;
-            line-height: 0.8;
-            text-transform: uppercase;
-        }
-        
-        .text-cinematic {
-            font-family: var(--font-cinematic);
-            font-size: clamp(2rem, 5vw, 8rem);
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .text-ui {
-            font-family: var(--font-ui);
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
+        /* Typography System */
+        .txt-massive { font-family: var(--f-massive); font-weight: 700; text-transform: uppercase; line-height: 0.85; }
+        .txt-cinematic { font-family: var(--f-cinematic); font-weight: 400; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.2; }
+        .txt-ui { font-family: var(--f-ui); font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; }
+        .txt-serif-body { font-family: var(--f-cinematic); text-transform: none; font-size: clamp(1.2rem, 3vw, 2.5rem); line-height: 1.6; font-weight: 400; }
 
         /* ============================================================
-           CURSOR
+           CUSTOM CURSOR SYSTEM (THE LENS)
            ============================================================ */
-        .cursor-dot, .cursor-outline {
-            position: fixed;
-            top: 0; left: 0;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: var(--z-cursor);
+        .cursor-core, .cursor-lens, .cursor-label {
+            position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-cursor);
             transform: translate(-50%, -50%);
         }
-        .cursor-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--color-white);
+        .cursor-core {
+            width: 4px; height: 4px; background: var(--c-light); border-radius: 50%;
+            transition: opacity 0.3s, transform 0.2s;
         }
-        .cursor-outline {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255,255,255,0.5);
-            transition: width 0.3s, height 0.3s, background-color 0.3s, mix-blend-mode 0.3s;
+        .cursor-lens {
+            width: 40px; height: 40px; border: 1px solid rgba(253,253,253,0.3); border-radius: 50%;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s, mix-blend-mode 0.4s;
         }
-        .cursor-outline.hover {
-            width: 80px;
-            height: 80px;
-            background-color: var(--color-white);
-            mix-blend-mode: difference;
-            border: none;
-        }
-        .cursor-outline.drag {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(255,255,255,0.1);
-            border-color: var(--color-white);
-        }
-
-        /* ============================================================
-           LOADER
-           ============================================================ */
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: var(--color-black);
-            z-index: var(--z-loader);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .loader-text {
-            overflow: hidden;
-        }
-        .loader-text span {
-            display: inline-block;
-            transform: translateY(100%);
-        }
-        .loader-progress {
-            margin-top: 2rem;
-            width: 200px;
-            height: 1px;
-            background: rgba(255,255,255,0.2);
-            position: relative;
-        }
-        .loader-bar {
-            position: absolute;
-            top: 0; left: 0;
-            height: 100%;
-            background: var(--color-white);
-            width: 0%;
-        }
-
-        /* ============================================================
-           NAVIGATION & UI
-           ============================================================ */
-        nav {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            padding: 2rem 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: var(--z-ui);
-            mix-blend-mode: difference;
-        }
-        .nav-logo { font-weight: 700; letter-spacing: 0.1em; }
-        .nav-menu { display: flex; gap: 2rem; }
-        .nav-link { position: relative; padding: 0.5rem; overflow: hidden; }
-        .nav-link::after {
-            content: ''; position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 1px;
-            background: var(--color-white);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        .nav-link:hover::after { transform: translateX(0); }
-
-        /* ============================================================
-           WEBGL CANVAS
-           ============================================================ */
-        #webgl-container {
-            position: fixed;
-            inset: 0;
-            z-index: var(--z-webgl);
-            pointer-events: none;
-            opacity: 0.6; /* Atmosphere */
-        }
-
-        /* ============================================================
-           SCENE ARCHITECTURE
-           ============================================================ */
-        main {
-            position: relative;
-            z-index: var(--z-content);
-        }
-        .scene {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .scene-pinned {
-            height: 100vh;
+        .cursor-label {
+            font-family: var(--f-ui); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--c-void); opacity: 0; transition: opacity 0.3s;
+            text-align: center; margin-top: -1px;
         }
         
-        /* SCENE 01: OPENING */
-        #scene-opening {
-            background: var(--color-black);
-        }
-        .opening-title {
-            position: absolute;
-            white-space: nowrap;
-            mix-blend-mode: difference;
-            z-index: 2;
-        }
-        .opening-bg {
-            position: absolute;
-            inset: 0;
-            background-image: url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&q=80');
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transform: scale(1.2);
+        /* Cursor States */
+        body.cursor-hover .cursor-lens { width: 80px; height: 80px; background: var(--c-light); mix-blend-mode: difference; border: none; }
+        body.cursor-explore .cursor-lens { width: 100px; height: 100px; background: var(--c-light); border: none; }
+        body.cursor-explore .cursor-core { opacity: 0; }
+        body.cursor-explore .cursor-label { opacity: 1; }
+        body.cursor-hidden .cursor-core, body.cursor-hidden .cursor-lens { opacity: 0; }
+
+        /* ============================================================
+           WEBGL ENVIRONMENT
+           ============================================================ */
+        #webgl-canvas {
+            position: fixed; inset: 0; z-index: var(--z-webgl); pointer-events: none; opacity: 0.8;
+            mix-blend-mode: screen;
         }
 
-        /* SCENE 02: THE CHRIST / OMEGA */
-        #scene-omega {
-            background: var(--color-black);
+        /* ============================================================
+           GLOBAL UI & NAVIGATION
+           ============================================================ */
+        .hud {
+            position: fixed; inset: 0; z-index: var(--z-ui); pointer-events: none;
+            padding: 2rem 3vw; display: flex; flex-direction: column; justify-content: space-between;
         }
-        .omega-image-wrapper {
-            position: absolute;
-            width: 50vw;
-            height: 70vh;
-            overflow: hidden;
-            clip-path: inset(100% 0 0 0);
-        }
-        .omega-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.5);
-            /* Concept from prompt references: Majestic bright lighting, Jesus imagery */
-            background-image: url('https://images.unsplash.com/photo-1544078869-7080b06b9b1e?auto=format&fit=crop&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-        .omega-text-container {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            pointer-events: none;
-            mix-blend-mode: overlay;
-        }
-        .omega-letter {
-            display: inline-block;
-            transform: translateY(100vh);
-            opacity: 0;
-        }
-
-        /* SCENE 03: COMMUNITY HORIZONTAL */
-        #scene-community {
-            height: 100vh;
-            width: 400vw; /* 4 screens wide */
-            display: flex;
-            flex-direction: row;
-            background: var(--color-white);
-            color: var(--color-black);
-        }
-        .community-panel {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding: 5vw;
-        }
-        .comm-img {
-            width: 60%;
-            height: 80%;
-            object-fit: cover;
-            filter: grayscale(100%);
-            transform-origin: center;
-        }
-        .comm-text {
-            position: absolute;
-            left: 10vw;
-            bottom: 15vh;
-            mix-blend-mode: difference;
-            color: var(--color-white); /* Difference makes it black on white */
-        }
-
-        /* SCENE 04: SYDNEY / ENVIRONMENT */
-        #scene-sydney {
-            background: var(--color-black);
-        }
-        .sydney-wrapper {
-            position: absolute;
-            inset: 0;
-            clip-path: circle(0% at 50% 50%);
-        }
-        .sydney-bg {
-            width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80');
-            background-size: cover;
-            background-position: center;
-            filter: brightness(0.4);
-        }
-        .sydney-typography {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 100%;
-        }
+        .hud-top { display: flex; justify-content: space-between; align-items: center; pointer-events: auto; mix-blend-mode: difference; }
+        .hud-bottom { display: flex; justify-content: space-between; align-items: flex-end; mix-blend-mode: difference; }
         
-        /* SCENE 05: EVENTS / GATHERINGS (3D) */
-        #scene-events {
-            perspective: 1000px;
-            background: var(--color-dark-grey);
-        }
-        .event-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10vh;
-            transform-style: preserve-3d;
-        }
-        .event-item {
-            font-size: clamp(3rem, 8vw, 10rem);
-            font-family: var(--font-massive);
-            opacity: 0.1;
-            transform: translateZ(-500px) rotateX(20deg);
-            transition: opacity 0.3s;
-        }
-        .event-item.active {
-            opacity: 1;
-            color: var(--color-accent);
-        }
+        .nav-logo { font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; color: var(--c-light); overflow: hidden; }
+        .nav-logo span { display: inline-block; transform: translateY(100%); transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1); }
+        .nav-logo.loaded span { transform: translateY(0); }
         
-        /* SCENE 06: FINALE / INVITATION */
-        #scene-finale {
-            background: var(--color-black);
+        .menu-btn { background: none; border: none; color: var(--c-light); display: flex; flex-direction: column; gap: 6px; padding: 10px; }
+        .menu-line { width: 30px; height: 1px; background: var(--c-light); transform-origin: right; transition: transform 0.4s; }
+        .menu-btn:hover .menu-line:nth-child(1) { transform: scaleX(0.7); }
+        .menu-btn:hover .menu-line:nth-child(2) { transform: scaleX(1); }
+        .menu-btn:hover .menu-line:nth-child(3) { transform: scaleX(0.5); }
+
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--c-light); width: 0%; transform-origin: left; z-index: var(--z-ui); }
+
+        /* ============================================================
+           SCENE ARCHITECTURE (THE FILM)
+           ============================================================ */
+        main { position: relative; z-index: var(--z-film); }
+        .scene { position: relative; width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        
+        /* Common Image/Background Setup */
+        .cinematic-bg { position: absolute; inset: -5%; width: 110%; height: 110%; object-fit: cover; z-index: 1; pointer-events: none; }
+        .overlay-dark { position: absolute; inset: 0; background: rgba(2,2,2,0.6); z-index: 2; }
+        .overlay-gradient { position: absolute; inset: 0; background: linear-gradient(to top, var(--c-void) 0%, transparent 50%, var(--c-void) 100%); z-index: 2; }
+
+        /* -----------------------------------------
+           SCENE 01: OPENING (Mystery -> Awe)
+           ----------------------------------------- */
+        #s-opening { background: var(--c-void); perspective: 1000px; }
+        .open-title-wrap { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; mix-blend-mode: difference; }
+        .open-title { font-size: clamp(4rem, 12vw, 15rem); color: var(--c-light); white-space: nowrap; }
+        .open-title span { display: inline-block; }
+        .open-sub { font-size: clamp(1rem, 2vw, 2rem); margin-top: -1rem; letter-spacing: 0.5em; opacity: 0; }
+
+        /* -----------------------------------------
+           SCENE 02: CHRIST (Awe & Scale)
+           ----------------------------------------- */
+        #s-christ { background: var(--c-void); }
+        .christ-img { filter: contrast(1.1) brightness(0.9); }
+        .christ-typography { position: absolute; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; mix-blend-mode: overlay; pointer-events: none; }
+        .ct-word { font-size: clamp(8rem, 25vw, 30rem); opacity: 0; transform: scale(1.5); color: var(--c-light); }
+        .cross-mask { position: absolute; inset: 0; z-index: 5; background: var(--c-void); clip-path: polygon(48% 0, 52% 0, 52% 35%, 100% 35%, 100% 40%, 52% 40%, 52% 100%, 48% 100%, 48% 40%, 0 40%, 0 35%, 48% 35%); transform: scale(10); opacity: 0; }
+
+        /* -----------------------------------------
+           SCENE 03: ABOUT (The Blur Reveal - Intimacy)
+           ----------------------------------------- */
+        #s-about { background: var(--c-void); z-index: 6; }
+        .about-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; filter: grayscale(100%) blur(20px); transition: filter 0.1s, opacity 0.1s; }
+        .about-text-container { position: relative; z-index: 10; width: 80%; max-width: 1200px; text-align: center; }
+        
+        /* THE CRITICAL BLUR TEXT */
+        .about-paragraph { 
+            /* Starting state: heavy blur, low opacity, slight offset */
+            filter: blur(14px); 
+            opacity: 0.12; 
+            transform: scale(0.95) translateY(20px); 
+            color: var(--c-light);
+            will-change: filter, opacity, transform;
         }
-        .finale-light {
-            position: absolute;
-            width: 2vw; height: 2vw;
-            background: var(--color-white);
-            border-radius: 50%;
-            box-shadow: 0 0 100px 50px rgba(255,255,255,0.8);
-            opacity: 0;
+
+        /* -----------------------------------------
+           SCENE 04: COMMUNITY (Rapid Edit / Energy)
+           ----------------------------------------- */
+        #s-community { background: var(--c-light); color: var(--c-void); }
+        .comm-grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 1vw; padding: 1vw; z-index: 1; transform: scale(2); opacity: 0; }
+        .comm-item { position: relative; overflow: hidden; background: var(--c-void); }
+        .comm-item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transform: scale(1.5); }
+        .comm-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; mix-blend-mode: difference; color: var(--c-light); width: 100%; pointer-events: none; }
+        .comm-huge-word { font-size: clamp(5rem, 18vw, 25rem); line-height: 0.8; margin: 0; }
+
+        /* -----------------------------------------
+           SCENE 05: SYDNEY (Reflection & Environment)
+           ----------------------------------------- */
+        #s-sydney { background: var(--c-void); }
+        .syd-bg { filter: brightness(0.3) saturate(0.5); transform-origin: bottom center; }
+        .syd-text-wrap { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 5; pointer-events: none; mix-blend-mode: screen; }
+        .syd-huge { font-size: clamp(6rem, 20vw, 35rem); color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,0.2); text-transform: uppercase; }
+
+        /* -----------------------------------------
+           SCENE 06: EVENTS (Acceleration & Depth)
+           ----------------------------------------- */
+        #s-events { background: var(--c-void); perspective: 1500px; overflow: visible; }
+        .events-tunnel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100vw; height: 100vh; transform-style: preserve-3d; }
+        .event-card { 
+            position: absolute; top: 50%; left: 50%; width: 80vw; text-align: center;
+            transform: translate(-50%, -50%) translateZ(-3000px); opacity: 0;
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
         }
+        .event-name { font-size: clamp(3rem, 10vw, 12rem); color: var(--c-light); line-height: 0.9; text-shadow: 0 0 40px rgba(255,255,255,0.3); }
+        .event-meta { font-family: var(--f-ui); font-size: clamp(1rem, 2vw, 1.5rem); letter-spacing: 0.2em; color: var(--c-gold); }
+        .event-line { width: 0px; height: 2px; background: var(--c-gold); margin-top: 1rem; }
+
+        /* -----------------------------------------
+           SCENE 07: FINALE (Climax)
+           ----------------------------------------- */
+        #s-finale { background: var(--c-void); z-index: 20; }
+        .finale-light { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 10vw; height: 10vw; background: var(--c-light); border-radius: 50%; box-shadow: 0 0 200px 100px var(--c-light); z-index: 1; }
+        .finale-content { position: relative; z-index: 10; text-align: center; mix-blend-mode: difference; color: var(--c-light); }
+        .finale-msg { font-size: clamp(2rem, 6vw, 8rem); margin-bottom: 3rem; opacity: 0; }
+        
+        /* Magnetic CTA Button */
         .btn-magnetic {
-            padding: 1.5rem 4rem;
-            border: 1px solid var(--color-white);
-            border-radius: 50px;
-            background: transparent;
-            color: var(--color-white);
-            font-family: var(--font-ui);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            position: relative;
-            overflow: hidden;
-            z-index: 2;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 1.5rem 4rem; border: 1px solid var(--c-light); border-radius: 100px;
+            background: transparent; color: var(--c-light);
+            font-family: var(--f-ui); font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase;
+            position: relative; overflow: hidden; transition: color 0.4s; z-index: 20;
         }
         .btn-magnetic::before {
-            content: '';
-            position: absolute;
-            top: 100%; left: 0; width: 100%; height: 100%;
-            background: var(--color-white);
-            transition: top 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-            z-index: -1;
+            content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%;
+            background: var(--c-light); transition: top 0.5s cubic-bezier(0.76, 0, 0.24, 1); z-index: -1;
         }
         .btn-magnetic:hover::before { top: 0; }
-        .btn-magnetic:hover { color: var(--color-black); }
+        .btn-magnetic:hover { color: var(--c-void); border-color: transparent; }
 
-        /* Accessibility / Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; animation: none !important; }
-            .cursor-dot, .cursor-outline, #webgl-container { display: none !important; }
-            body { cursor: auto; }
+        /* -----------------------------------------
+           SCENE 08: FOOTER (Credits)
+           ----------------------------------------- */
+        #s-footer { height: auto; min-height: 100vh; background: var(--c-concrete); display: flex; flex-direction: column; justify-content: flex-end; padding: 5vw; z-index: 15; position: relative; }
+        .ft-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4rem; margin-bottom: 10vh; }
+        .ft-col h4 { font-family: var(--f-cinematic); font-size: 1.5rem; margin-bottom: 2rem; color: var(--c-gold); }
+        .ft-col ul { list-style: none; }
+        .ft-col li { margin-bottom: 1rem; }
+        .ft-col a { color: rgba(255,255,255,0.6); text-decoration: none; font-family: var(--f-ui); font-size: 0.9rem; letter-spacing: 0.1em; transition: color 0.3s; text-transform: uppercase; }
+        .ft-col a:hover { color: var(--c-light); }
+        .ft-bottom { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; }
+        .ft-huge { font-family: var(--f-massive); font-size: clamp(4rem, 15vw, 20rem); line-height: 0.75; color: var(--c-light); opacity: 0.05; }
+        .ft-legal { font-family: var(--f-ui); font-size: 0.7rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+
+        /* ============================================================
+           LOADING CURTAIN (BLACKOUT)
+           ============================================================ */
+        #curtain { position: fixed; inset: 0; background: var(--c-void); z-index: var(--z-curtain); display: flex; justify-content: center; align-items: center; }
+        .curtain-text { font-family: var(--f-cinematic); font-size: 2rem; letter-spacing: 0.5em; overflow: hidden; }
+        .curtain-text span { display: inline-block; transform: translateY(100%); opacity: 0; }
+
+        /* ============================================================
+           RESPONSIVE & ACCESSIBILITY LOGIC
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .ft-grid { grid-template-columns: repeat(2, 1fr); }
+            .comm-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); }
         }
-        
-        /* Mobile Specifics */
         @media (max-width: 768px) {
-            .nav-menu { display: none; } /* Simplified for mobile demo */
-            .omega-image-wrapper { width: 90vw; }
-            #scene-community { flex-direction: column; width: 100vw; height: 400vh; }
-            .community-panel { height: 100vh; }
-            .comm-img { width: 90%; height: 60%; }
-            .text-massive { font-size: 25vw; }
+            .hud-bottom { display: none; } /* Hide complex HUD on mobile */
+            .ft-grid { grid-template-columns: 1fr; }
+            .txt-serif-body { font-size: 1.5rem; }
+            .events-tunnel { perspective: 800px; }
+            .btn-magnetic { padding: 1rem 2rem; }
+            body.cursor-hover .cursor-lens, body.cursor-explore .cursor-lens, .cursor-core, .cursor-lens, .cursor-label { display: none !important; }
+            * { cursor: auto !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+            #webgl-canvas { display: none; }
+            /* Provide acceptable static fallbacks if motion is disabled */
+            .about-paragraph { filter: blur(0px) !important; opacity: 1 !important; transform: none !important; }
+            .comm-grid, .comm-item img { transform: none !important; opacity: 1 !important; }
+            .event-card { transform: translate(-50%, -50%) !important; opacity: 1 !important; position: relative; margin: 10vh 0; top: 0; left: 0; width: 100%; }
+            #s-events { overflow: auto; background: var(--c-void); height: auto; padding: 20vh 0; }
         }
     </style>
 </head>
 <body>
 
     <!-- CUSTOM CURSOR -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <div class="cursor-core"></div>
+    <div class="cursor-lens"></div>
+    <div class="cursor-label">EXPLORE</div>
 
-    <!-- LOADER -->
-    <div id="loader">
-        <div class="text-cinematic loader-text">
-            <span>AWAKEN</span>
-        </div>
-        <div class="loader-progress">
-            <div class="loader-bar"></div>
+    <!-- LOADING CURTAIN -->
+    <div id="curtain">
+        <div class="curtain-text">
+            <span>A</span><span>W</span><span>A</span><span>K</span><span>E</span><span>N</span>
         </div>
     </div>
 
-    <!-- WEBGL BACKGROUND (Atmosphere/Particles) -->
-    <div id="webgl-container"></div>
-
-    <!-- NAVIGATION -->
-    <nav>
-        <div class="nav-logo text-ui hover-target">CSI SYDNEY YOUTH</div>
-        <div class="nav-menu text-ui">
-            <div class="nav-link hover-target">Vision</div>
-            <div class="nav-link hover-target">Community</div>
-            <div class="nav-link hover-target">Gatherings</div>
+    <!-- UI HUD -->
+    <div class="hud">
+        <div class="hud-top">
+            <div class="nav-logo hover-target"><span>CSI SYDNEY</span></div>
+            <button class="menu-btn hover-target" aria-label="Menu">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </button>
         </div>
-    </nav>
+        <div class="hud-bottom">
+            <div class="txt-ui">SCROLL TO EXPERIENCE</div>
+            <div class="txt-ui" id="scroll-indicator">00 / 07</div>
+        </div>
+    </div>
+    <div class="progress-bar"></div>
 
-    <!-- MAIN SCROLL CONTAINER -->
-    <main id="smooth-wrapper">
-        <div id="smooth-content">
+    <!-- WEBGL ATMOSPHERE -->
+    <canvas id="webgl-canvas"></canvas>
 
-            <!-- SCENE 01: THE OPENING -->
-            <section id="scene-opening" class="scene scene-pinned">
-                <div class="opening-bg"></div>
-                <h1 class="text-massive opening-title">
-                    <span class="ot-word">CSI</span>
-                    <span class="ot-word">SYDNEY</span>
+    <!-- CINEMATIC FILM CONTAINER -->
+    <main id="film-roll">
+
+        <!-- SCENE 01: OPENING -->
+        <section id="s-opening" class="scene">
+            <div class="open-title-wrap">
+                <h1 class="txt-massive open-title">
+                    <span class="ot-part">CSI</span>
+                    <span class="ot-part">SYDNEY</span>
                 </h1>
-            </section>
-
-            <!-- SCENE 02: THE OMEGA (CHRIST FOCUSED) -->
-            <section id="scene-omega" class="scene scene-pinned">
-                <div class="omega-image-wrapper">
-                    <div class="omega-image"></div>
-                </div>
-                <div class="omega-text-container text-massive">
-                    <!-- Referencing "OMEGA" from image inspiration -->
-                    <span class="omega-letter">O</span>
-                    <span class="omega-letter">M</span>
-                    <span class="omega-letter">E</span>
-                    <span class="omega-letter">G</span>
-                    <span class="omega-letter">A</span>
-                </div>
-                <div class="text-cinematic" style="position:absolute; bottom: 10vh; opacity:0;" id="omega-sub">
-                    The Beginning and The End
-                </div>
-            </section>
-
-            <!-- SCENE 03: COMMUNITY (HORIZONTAL CINEMATOGRAPHY) -->
-            <div class="horizontal-scroll-wrapper" style="overflow: hidden;">
-                <section id="scene-community">
-                    <div class="community-panel">
-                        <img src="https://images.unsplash.com/photo-1511632765486-a01c80cb2628?auto=format&fit=crop&q=80" alt="Youth Gathered" class="comm-img hover-target">
-                        <h2 class="text-massive comm-text">FELLOWSHIP</h2>
-                    </div>
-                    <div class="community-panel">
-                        <img src="https://images.unsplash.com/photo-1529156069898-49953eb1b5b6?auto=format&fit=crop&q=80" alt="Hands raised" class="comm-img hover-target">
-                        <h2 class="text-massive comm-text">WORSHIP</h2>
-                    </div>
-                    <div class="community-panel">
-                        <img src="https://images.unsplash.com/photo-1527525443983-6e60c75fff46?auto=format&fit=crop&q=80" alt="Group smiling" class="comm-img hover-target">
-                        <h2 class="text-massive comm-text">FAMILY</h2>
-                    </div>
-                    <div class="community-panel" style="background: var(--color-black); color: var(--color-white);">
-                        <div class="text-cinematic text-center" style="mix-blend-mode: normal; color: white;">
-                            More than a crowd.<br>A generation.
-                        </div>
-                    </div>
-                </section>
+                <div class="txt-cinematic open-sub">YOUTH MINISTRY</div>
             </div>
+        </section>
 
-            <!-- SCENE 04: SYDNEY / URBAN TRANSITION -->
-            <section id="scene-sydney" class="scene scene-pinned">
-                <div class="sydney-wrapper">
-                    <div class="sydney-bg"></div>
-                </div>
-                <div class="sydney-typography">
-                    <h2 class="text-cinematic syd-text-1" style="opacity:0;">CALLED IN</h2>
-                    <h1 class="text-massive syd-text-2" style="opacity:0; color: var(--color-accent);">SYDNEY</h1>
-                </div>
-            </section>
+        <!-- SCENE 02: CHRIST -->
+        <section id="s-christ" class="scene">
+            <!-- Asset: Ethereal/Classical lighting representation -->
+            <img src="https://images.unsplash.com/photo-1544078869-7080b06b9b1e?auto=format&fit=crop&w=2560&q=80" alt="Cinematic representation of faith" class="cinematic-bg christ-img" data-explore="VIEW">
+            <div class="overlay-dark"></div>
+            <div class="christ-typography txt-massive">
+                <div class="ct-word">THE WAY</div>
+                <div class="ct-word" style="position:absolute;">THE TRUTH</div>
+                <div class="ct-word" style="position:absolute;">THE LIFE</div>
+            </div>
+            <!-- Transition Mask -->
+            <div class="cross-mask"></div>
+        </section>
 
-            <!-- SCENE 05: EVENTS (3D SCROLL) -->
-            <section id="scene-events" class="scene scene-pinned">
-                <div class="event-list">
-                    <div class="event-item">FRIDAY YOUTH</div>
-                    <div class="event-item">SUMMER CAMP</div>
-                    <div class="event-item">WORSHIP NIGHT</div>
-                    <div class="event-item">SUNDAY GATHERING</div>
-                </div>
-            </section>
+        <!-- SCENE 03: ABOUT CSI SYDNEY YOUTH (The Blur Reveal) -->
+        <section id="s-about" class="scene">
+            <!-- Asset: Subtle, blurred gathering in background -->
+            <img src="https://images.unsplash.com/photo-1529156069898-49953eb1b5b6?auto=format&fit=crop&w=2560&q=80" alt="Youth gathering" class="about-bg-video">
+            <div class="overlay-gradient"></div>
+            
+            <div class="about-text-container">
+                <h2 class="txt-cinematic" style="color: var(--c-gold); margin-bottom: 2rem; font-size: clamp(1rem, 2vw, 2rem); letter-spacing: 0.3em; opacity: 0;" id="about-heading">ABOUT US</h2>
+                <p class="txt-serif-body about-paragraph">
+                    We are more than a gathering. We are a generation seeking authentic encounter. Rooted in the rich heritage of the Church of South India, yet fully alive in the rhythm of this city. We exist to know Christ, to make Him known, and to build a community where every soul finds belonging, purpose, and unshakeable faith.
+                </p>
+            </div>
+        </section>
 
-            <!-- SCENE 06: FINALE -->
-            <section id="scene-finale" class="scene scene-pinned">
-                <div class="finale-light"></div>
-                <div class="finale-content" style="text-align: center; z-index: 10; opacity: 0; transform: translateY(50px);">
-                    <h2 class="text-cinematic" style="margin-bottom: 2rem;">STEP INTO THE STORY</h2>
-                    <button class="btn-magnetic hover-target">Join Us</button>
-                </div>
-            </section>
+        <!-- SCENE 04: COMMUNITY (Rapid Edit) -->
+        <section id="s-community" class="scene">
+            <div class="comm-grid">
+                <!-- Assets: Real human moments, worship, friendship -->
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1511632765486-a01c80cb2628?auto=format&fit=crop&w=800&q=80" alt="Fellowship"></div>
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1527525443983-6e60c75fff46?auto=format&fit=crop&w=800&q=80" alt="Joy"></div>
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1609234656388-0ff363383889?auto=format&fit=crop&w=800&q=80" alt="Prayer"></div>
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1499203649931-e1cb07c9b31d?auto=format&fit=crop&w=800&q=80" alt="Worship"></div>
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1523580494112-071d16940a4c?auto=format&fit=crop&w=800&q=80" alt="Connection"></div>
+                <div class="comm-item"><img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80" alt="Together"></div>
+            </div>
+            <div class="comm-center-text">
+                <h2 class="txt-massive comm-huge-word">ONE</h2>
+                <h2 class="txt-massive comm-huge-word" style="position:absolute; top:0; opacity:0;">BODY</h2>
+                <h2 class="txt-massive comm-huge-word" style="position:absolute; top:0; opacity:0;">FAMILY</h2>
+            </div>
+        </section>
 
-        </div>
+        <!-- SCENE 05: SYDNEY (Environment Parallax) -->
+        <section id="s-sydney" class="scene">
+            <!-- Asset: Cinematic Sydney Night / Urban landscape -->
+            <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=2560&q=80" alt="Sydney Skyline" class="cinematic-bg syd-bg">
+            <div class="overlay-dark" style="background: rgba(2,2,2,0.4);"></div>
+            <div class="syd-text-wrap">
+                <h2 class="txt-massive syd-huge">CALLED HERE</h2>
+            </div>
+        </section>
+
+        <!-- SCENE 06: EVENTS (Deep Z-Axis Tunnel) -->
+        <section id="s-events" class="scene">
+            <div class="events-tunnel">
+                <!-- Authentic Placeholder Data replacing fabricated events -->
+                <div class="event-card">
+                    <div class="txt-cinematic event-meta">[DATE PLACEHOLDER]</div>
+                    <h2 class="txt-massive event-name">[EVENT NAME]</h2>
+                    <div class="txt-ui event-meta" style="color: var(--c-light);">[VENUE / LOCATION]</div>
+                    <div class="event-line"></div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="txt-cinematic event-meta">[DATE PLACEHOLDER]</div>
+                    <h2 class="txt-massive event-name">[EVENT NAME]</h2>
+                    <div class="txt-ui event-meta" style="color: var(--c-light);">[VENUE / LOCATION]</div>
+                    <div class="event-line"></div>
+                </div>
+
+                <div class="event-card">
+                    <div class="txt-cinematic event-meta">[DATE PLACEHOLDER]</div>
+                    <h2 class="txt-massive event-name">[YOUTH GATHERING]</h2>
+                    <div class="txt-ui event-meta" style="color: var(--c-light);">[VENUE / LOCATION]</div>
+                    <div class="event-line"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENE 07: FINALE -->
+        <section id="s-finale" class="scene">
+            <div class="finale-light"></div>
+            <div class="finale-content">
+                <h2 class="txt-cinematic finale-msg">STEP INTO<br>THE STORY</h2>
+                <a href="#" class="btn-magnetic hover-target">JOIN THE COMMUNITY</a>
+            </div>
+        </section>
+
+        <!-- SCENE 08: FOOTER (Cinematic Credits) -->
+        <footer id="s-footer">
+            <div class="ft-grid">
+                <div class="ft-col">
+                    <h4>CSI SYDNEY YOUTH</h4>
+                    <p class="txt-ui" style="text-transform: none; line-height: 1.8; color: rgba(255,255,255,0.6);">
+                        A generation called to know Christ and make Him known in the heart of Sydney.
+                    </p>
+                </div>
+                <div class="ft-col">
+                    <h4>EXPLORE</h4>
+                    <ul>
+                        <li><a href="#" class="hover-target">Our Story</a></li>
+                        <li><a href="#" class="hover-target">Beliefs</a></li>
+                        <li><a href="#" class="hover-target">Gatherings</a></li>
+                        <li><a href="#" class="hover-target">Leadership</a></li>
+                    </ul>
+                </div>
+                <div class="ft-col">
+                    <h4>CONNECT</h4>
+                    <ul>
+                        <li><a href="#" class="hover-target">Instagram</a></li>
+                        <li><a href="#" class="hover-target">YouTube</a></li>
+                        <li><a href="#" class="hover-target">Spotify</a></li>
+                        <li><a href="#" class="hover-target">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="ft-col">
+                    <h4>VISIT</h4>
+                    <p class="txt-ui" style="line-height: 1.8; color: rgba(255,255,255,0.6);">
+                        [CHURCH ADDRESS LINE 1]<br>
+                        [SUBURB, NSW, POSTCODE]<br><br>
+                        [TIME OF SERVICE]
+                    </p>
+                </div>
+            </div>
+            <div class="ft-bottom">
+                <div class="ft-legal">© 2026 CSI SYDNEY YOUTH. ALL RIGHTS RESERVED.</div>
+                <div class="ft-legal">DESIGNED FOR IMPACT.</div>
+            </div>
+            <!-- Massive background text watermark -->
+            <div style="position: absolute; bottom: -5vh; left: 0; width: 100%; text-align: center; pointer-events: none; overflow: hidden;">
+                <h1 class="ft-huge">AWAKEN</h1>
+            </div>
+        </footer>
+
     </main>
 
     <!-- ============================================================
-         JAVASCRIPT ARCHITECTURE
+         DIRECTOR'S CUT JAVASCRIPT: THE EDITING BAY
          ============================================================ -->
     <script>
         // ------------------------------------------------------------
-        // 1. UTILITIES & REGISTRATION
+        // 0. SYSTEM BOOTSTRAP & FALLBACKS
         // ------------------------------------------------------------
         gsap.registerPlugin(ScrollTrigger);
 
@@ -531,169 +479,190 @@
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // ------------------------------------------------------------
-        // 2. PERFORMANCE & FALLBACK MANAGER
+        // 1. SMOOTH SCROLL ENGINE (LENIS)
         // ------------------------------------------------------------
-        class PerformanceManager {
-            constructor() {
-                this.dpr = Math.min(window.devicePixelRatio, 2); // Cap pixel ratio
-                this.quality = isMobile ? 'low' : 'high';
-            }
-        }
-        const Perf = new PerformanceManager();
-
-        // ------------------------------------------------------------
-        // 3. SMOOTH SCROLL (LENIS)
-        // ------------------------------------------------------------
-        class ScrollDirector {
+        class ScrollEngine {
             constructor() {
                 if (prefersReducedMotion) return;
                 
                 this.lenis = new Lenis({
-                    duration: 1.2,
+                    duration: 1.5, // Cinematic heavy feel
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                     direction: 'vertical',
                     gestureDirection: 'vertical',
                     smooth: true,
-                    mouseMultiplier: 1,
+                    mouseMultiplier: 0.8,
                     smoothTouch: false,
-                    touchMultiplier: 2,
                 });
 
                 this.lenis.on('scroll', ScrollTrigger.update);
-
-                gsap.ticker.add((time) => {
-                    this.lenis.raf(time * 1000);
+                
+                // Track progress for HUD
+                this.lenis.on('scroll', (e) => {
+                    const progress = e.progress * 100;
+                    document.querySelector('.progress-bar').style.width = `${progress}%`;
+                    
+                    // Simple Scene Calculator for HUD
+                    const sceneIndex = Math.min(7, Math.max(1, Math.ceil(e.progress * 7.5)));
+                    document.getElementById('scroll-indicator').innerText = `0${sceneIndex} / 07`;
                 });
+
+                gsap.ticker.add((time) => { this.lenis.raf(time * 1000); });
                 gsap.ticker.lagSmoothing(0);
             }
         }
-        const Scroll = new ScrollDirector();
+        const Scroller = new ScrollEngine();
 
         // ------------------------------------------------------------
-        // 4. CURSOR & MAGNETIC SYSTEM
+        // 2. THE LENS (CUSTOM CURSOR SYSTEM)
         // ------------------------------------------------------------
-        class InteractionSystem {
+        class CursorSystem {
             constructor() {
                 if (isMobile || prefersReducedMotion) return;
                 
-                this.cursor = {
-                    dot: document.querySelector('.cursor-dot'),
-                    outline: document.querySelector('.cursor-outline'),
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2,
-                    dotX: window.innerWidth / 2,
-                    dotY: window.innerHeight / 2,
-                    outX: window.innerWidth / 2,
-                    outY: window.innerHeight / 2,
-                };
+                this.core = document.querySelector('.cursor-core');
+                this.lens = document.querySelector('.cursor-lens');
+                this.label = document.querySelector('.cursor-label');
                 
-                this.targets = document.querySelectorAll('.hover-target');
+                this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                this.pos = { coreX: window.innerWidth / 2, coreY: window.innerHeight / 2, lensX: window.innerWidth / 2, lensY: window.innerHeight / 2 };
+                
                 this.initEvents();
                 this.render();
             }
 
             initEvents() {
                 window.addEventListener('mousemove', (e) => {
-                    this.cursor.x = e.clientX;
-                    this.cursor.y = e.clientY;
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
                 });
 
-                this.targets.forEach(target => {
-                    target.addEventListener('mouseenter', () => this.cursor.outline.classList.add('hover'));
-                    target.addEventListener('mouseleave', () => this.cursor.outline.classList.remove('hover'));
+                // Hover Targets (Buttons, Links)
+                document.querySelectorAll('.hover-target').forEach(el => {
+                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
                 });
 
-                // Magnetic Buttons
-                const magnetics = document.querySelectorAll('.btn-magnetic');
-                magnetics.forEach(btn => {
+                // Explore Targets (Cinematic Images)
+                document.querySelectorAll('[data-explore]').forEach(el => {
+                    el.addEventListener('mouseenter', (e) => {
+                        document.body.classList.add('cursor-explore');
+                        this.label.innerText = e.target.getAttribute('data-explore');
+                    });
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-explore'));
+                });
+
+                // Magnetic Buttons Math
+                document.querySelectorAll('.btn-magnetic').forEach(btn => {
                     btn.addEventListener('mousemove', (e) => {
                         const rect = btn.getBoundingClientRect();
-                        const x = e.clientX - rect.left - rect.width / 2;
-                        const y = e.clientY - rect.top - rect.height / 2;
-                        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power2.out" });
+                        const x = (e.clientX - rect.left - rect.width / 2) * 0.4;
+                        const y = (e.clientY - rect.top - rect.height / 2) * 0.4;
+                        gsap.to(btn, { x, y, duration: 0.6, ease: "power3.out" });
                     });
                     btn.addEventListener('mouseleave', () => {
-                        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                        gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
                     });
                 });
             }
 
             render() {
-                // Linear interpolation for smooth trailing
-                this.cursor.dotX += (this.cursor.x - this.cursor.dotX) * 0.5;
-                this.cursor.dotY += (this.cursor.y - this.cursor.dotY) * 0.5;
-                this.cursor.outX += (this.cursor.x - this.cursor.outX) * 0.15;
-                this.cursor.outY += (this.cursor.y - this.cursor.outY) * 0.15;
+                // Lerp for cinematic trailing
+                this.pos.coreX += (this.mouse.x - this.pos.coreX) * 0.3;
+                this.pos.coreY += (this.mouse.y - this.pos.coreY) * 0.3;
+                this.pos.lensX += (this.mouse.x - this.pos.lensX) * 0.1;
+                this.pos.lensY += (this.mouse.y - this.pos.lensY) * 0.1;
 
-                this.cursor.dot.style.transform = `translate(${this.cursor.dotX}px, ${this.cursor.dotY}px)`;
-                this.cursor.outline.style.transform = `translate(${this.cursor.outX}px, ${this.cursor.outY}px)`;
+                this.core.style.transform = `translate(${this.pos.coreX}px, ${this.pos.coreY}px)`;
+                this.lens.style.transform = `translate(${this.pos.lensX}px, ${this.pos.lensY}px)`;
+                this.label.style.transform = `translate(${this.pos.lensX}px, ${this.pos.lensY}px)`;
 
                 requestAnimationFrame(() => this.render());
             }
         }
 
         // ------------------------------------------------------------
-        // 5. WEBGL ENVIRONMENT (THREE.JS) - ATMOSPHERE/PARTICLES
+        // 3. WEBGL PARTICLE ATMOSPHERE (THREE.JS)
         // ------------------------------------------------------------
-        class WebGLEngine {
+        class Atmosphere {
             constructor() {
                 if (prefersReducedMotion) return;
 
-                this.container = document.getElementById('webgl-container');
+                this.canvas = document.getElementById('webgl-canvas');
                 this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: Perf.quality === 'high' });
+                this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true, antialias: true });
                 
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(Perf.dpr);
-                this.container.appendChild(this.renderer.domElement);
-
-                this.camera.position.z = 50;
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 
-                this.particles = null;
+                this.camera.position.z = 100;
+                
                 this.scrollVelocity = 0;
                 this.lastScrollY = window.scrollY;
+                this.time = 0;
 
-                this.initParticles();
-                this.bindEvents();
+                this.buildParticles();
+                
+                window.addEventListener('resize', this.onResize.bind(this));
                 this.animate();
             }
 
-            initParticles() {
-                const count = Perf.quality === 'high' ? 3000 : 1000;
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(count * 3);
+            buildParticles() {
+                const count = isMobile ? 1500 : 4000;
+                const geo = new THREE.BufferGeometry();
+                const pos = new Float32Array(count * 3);
+                const randoms = new Float32Array(count); // For organic movement
                 
-                for(let i = 0; i < count * 3; i++) {
-                    positions[i] = (Math.random() - 0.5) * 200;
+                for(let i = 0; i < count * 3; i+=3) {
+                    pos[i] = (Math.random() - 0.5) * 400; // x
+                    pos[i+1] = (Math.random() - 0.5) * 400; // y
+                    pos[i+2] = (Math.random() - 0.5) * 200; // z
+                    randoms[i/3] = Math.random();
                 }
                 
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
                 
-                // Shader Material for glowing dust effect
-                const material = new THREE.ShaderMaterial({
+                // Custom Shader for cinematic dust that reacts to scroll velocity
+                const mat = new THREE.ShaderMaterial({
                     uniforms: {
-                        time: { value: 0 },
-                        color: { value: new THREE.Color(0xe2c08d) }
+                        uTime: { value: 0 },
+                        uVelocity: { value: 0 },
+                        uColor: { value: new THREE.Color('#cfa870') }
                     },
                     vertexShader: `
-                        uniform float time;
-                        varying vec2 vUv;
+                        uniform float uTime;
+                        uniform float uVelocity;
+                        attribute float aRandom;
+                        varying float vAlpha;
                         void main() {
                             vec3 pos = position;
-                            pos.y += sin(time * 0.5 + pos.x * 0.1) * 2.0;
+                            // Organic float
+                            pos.x += sin(uTime * 0.2 + aRandom * 10.0) * 2.0;
+                            pos.y += cos(uTime * 0.3 + aRandom * 10.0) * 2.0;
+                            // Velocity reaction (stretch/move based on scroll speed)
+                            pos.y += uVelocity * aRandom * 2.0;
+                            
                             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                            gl_PointSize = (100.0 / -mvPosition.z);
+                            
+                            // Size attenuation
+                            gl_PointSize = (40.0 * aRandom) * (1.0 / -mvPosition.z);
                             gl_Position = projectionMatrix * mvPosition;
+                            
+                            // Fade based on Z depth
+                            vAlpha = smoothstep(-100.0, 50.0, pos.z);
                         }
                     `,
                     fragmentShader: `
-                        uniform vec3 color;
+                        uniform vec3 uColor;
+                        varying float vAlpha;
                         void main() {
+                            // Circular particle with soft edge
                             float dist = length(gl_PointCoord - vec2(0.5));
                             if (dist > 0.5) discard;
-                            float alpha = smoothstep(0.5, 0.1, dist);
-                            gl_FragColor = vec4(color, alpha * 0.5);
+                            float alpha = smoothstep(0.5, 0.1, dist) * vAlpha * 0.6;
+                            gl_FragColor = vec4(uColor, alpha);
                         }
                     `,
                     transparent: true,
@@ -701,33 +670,37 @@
                     blending: THREE.AdditiveBlending
                 });
 
-                this.particles = new THREE.Points(geometry, material);
+                this.particles = new THREE.Points(geo, mat);
                 this.scene.add(this.particles);
             }
 
-            bindEvents() {
-                window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
+            onResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
             }
 
-            animate(time = 0) {
-                requestAnimationFrame((t) => this.animate(t));
+            animate() {
+                requestAnimationFrame(this.animate.bind(this));
                 
-                // Calculate scroll velocity for particle distortion
+                this.time += 0.01;
+                
+                // Calculate scroll velocity
                 const currentScroll = window.scrollY;
-                this.scrollVelocity = currentScroll - this.lastScrollY;
+                const rawVel = currentScroll - this.lastScrollY;
+                // Smooth the velocity
+                this.scrollVelocity += (rawVel - this.scrollVelocity) * 0.1;
                 this.lastScrollY = currentScroll;
 
-                if (this.particles) {
-                    this.particles.material.uniforms.time.value = time * 0.001;
-                    this.particles.rotation.y += 0.001;
-                    // React to scroll
-                    this.particles.position.y += this.scrollVelocity * 0.02;
-                    // Recenter gently
-                    this.particles.position.y += (0 - this.particles.position.y) * 0.05;
+                if(this.particles) {
+                    this.particles.material.uniforms.uTime.value = this.time;
+                    // Clamp velocity for the shader to prevent exploding geometry
+                    let clampedVel = Math.max(-50, Math.min(50, this.scrollVelocity));
+                    this.particles.material.uniforms.uVelocity.value = clampedVel * 0.1;
+                    
+                    // Slow majestic rotation
+                    this.particles.rotation.y = this.time * 0.05;
+                    this.particles.rotation.x = this.time * 0.02;
                 }
 
                 this.renderer.render(this.scene, this.camera);
@@ -735,41 +708,81 @@
         }
 
         // ------------------------------------------------------------
-        // 6. CINEMATIC SCENE MANAGER (GSAP TIMELINES)
+        // 4. THE EDITING BAY (GSAP SCENE TIMELINES)
         // ------------------------------------------------------------
-        class SceneManager {
+        class CinematicDirector {
             constructor() {
-                this.buildOpeningScene();
-                this.buildOmegaScene();
-                if (!isMobile) this.buildCommunityScene(); // Horizontal logic
-                this.buildSydneyScene();
-                this.buildEventsScene();
-                this.buildFinaleScene();
+                if (prefersReducedMotion) return;
+                
+                // Ensure layout is stable before building triggers
+                setTimeout(() => {
+                    this.buildOpening();
+                    this.buildChrist();
+                    this.buildAbout();
+                    this.buildCommunity();
+                    this.buildSydney();
+                    this.buildEvents();
+                    this.buildFinale();
+                    
+                    ScrollTrigger.refresh();
+                }, 100);
             }
 
-            // SCENE 1: OPENING (Scale out, Fade in background)
-            buildOpeningScene() {
+            // SHOT 1: OPENING -> Camera pushes THROUGH the text
+            buildOpening() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '#scene-opening',
+                        trigger: '#s-opening',
                         start: 'top top',
                         end: '+=150%',
+                        scrub: true, // Scrub makes it perfectly reversible
+                        pin: true,
+                    }
+                });
+
+                // The parts split apart and the camera pushes in
+                tl.to('.ot-part:nth-child(1)', { x: '-30vw', scale: 3, opacity: 0, ease: "power2.in" }, 0)
+                  .to('.ot-part:nth-child(2)', { x: '30vw', scale: 3, opacity: 0, ease: "power2.in" }, 0)
+                  .to('.open-sub', { scale: 5, opacity: 0, ease: "power2.in" }, 0)
+                  .to('#s-opening', { backgroundColor: 'transparent', ease: "none" }, 0.5); // Fade to next scene
+            }
+
+            // SHOT 2: CHRIST -> Awe & Scale -> Cross Mask Transition
+            buildChrist() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#s-christ',
+                        start: 'top top',
+                        end: '+=300%',
                         scrub: true,
                         pin: true,
                     }
                 });
 
-                // Bidirectional: Background appears, Text splits and scales hugely
-                tl.to('.opening-bg', { opacity: 0.6, scale: 1, duration: 2, ease: "power2.inOut" })
-                  .to('.ot-word:nth-child(1)', { x: '-50vw', opacity: 0, scale: 5, duration: 2, ease: "power2.inOut" }, "<")
-                  .to('.ot-word:nth-child(2)', { x: '50vw', opacity: 0, scale: 5, duration: 2, ease: "power2.inOut" }, "<");
+                // 1. Image zooms out slowly to reveal scale
+                tl.fromTo('.christ-img', { scale: 1.5 }, { scale: 1, duration: 2, ease: "none" }, 0);
+                
+                // 2. Huge typography hits
+                const words = document.querySelectorAll('.ct-word');
+                tl.to(words[0], { opacity: 1, scale: 1, duration: 0.5 }, 0.5)
+                  .to(words[0], { opacity: 0, scale: 2, duration: 0.5 }, 1.0)
+                  
+                  .to(words[1], { opacity: 1, scale: 1, duration: 0.5 }, 1.2)
+                  .to(words[1], { opacity: 0, scale: 2, duration: 0.5 }, 1.7)
+                  
+                  .to(words[2], { opacity: 1, scale: 1, duration: 0.5 }, 1.9)
+                  .to(words[2], { opacity: 0, scale: 2, duration: 0.5 }, 2.4);
+
+                // 3. Climax of scene: Mask transitions down into darkness
+                tl.to('.cross-mask', { opacity: 1, duration: 0.1 }, 2.5)
+                  .to('.cross-mask', { scale: 0, duration: 1.5, ease: "power4.inOut" }, 2.6);
             }
 
-            // SCENE 2: OMEGA / CHRIST (Image Reveal & Typography Mask)
-            buildOmegaScene() {
+            // SHOT 3: ABOUT -> The Critical Blur Reveal
+            buildAbout() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '#scene-omega',
+                        trigger: '#s-about',
                         start: 'top top',
                         end: '+=200%',
                         scrub: true,
@@ -777,67 +790,75 @@
                     }
                 });
 
-                // 1. Reveal image like a rising curtain
-                tl.to('.omega-image-wrapper', { clipPath: 'inset(0% 0% 0% 0%)', duration: 2, ease: "power3.inOut" })
-                  .to('.omega-image', { scale: 1, duration: 2, ease: "power3.inOut" }, "<")
-                  
-                  // 2. Letters of OMEGA rise from bottom sequentially
-                  .to('.omega-letter', { y: 0, opacity: 1, duration: 1.5, stagger: 0.2, ease: "power4.out" })
-                  
-                  // 3. Scale the OMEGA word massive while image zooms out slightly
-                  .to('.omega-text-container', { scale: 5, opacity: 0, duration: 2, ease: "power2.inOut" }, "+=0.5")
-                  .to('.omega-image', { scale: 1.2, filter: 'blur(10px)', duration: 2, ease: "power2.inOut" }, "<")
-                  
-                  // 4. Final text fade in
-                  .to('#omega-sub', { opacity: 1, y: -50, duration: 1 });
+                // Progressive Text Resolution (The Blur Effect)
+                // Using exact requirements: 0% blur(14px) -> 100% blur(0)
+                // Down-scroll clarifies, up-scroll blurs. Scrub handles reverse automatically.
+                
+                tl.to('#about-heading', { opacity: 1, y: -20, duration: 0.5 }, 0)
+                  .fromTo('.about-paragraph', 
+                    { 
+                        filter: 'blur(14px)', 
+                        opacity: 0.12, 
+                        transform: 'scale(0.95) translateY(20px)' 
+                    },
+                    { 
+                        filter: 'blur(0px)', 
+                        opacity: 1, 
+                        transform: 'scale(1) translateY(0)', 
+                        duration: 1.5, 
+                        ease: "power2.inOut" 
+                    }, 0);
+
+                // Background environment sharpens and brightens synchronously
+                tl.to('.about-bg-video', {
+                    filter: 'grayscale(0%) blur(0px)',
+                    opacity: 0.6,
+                    duration: 1.5,
+                    ease: "power2.inOut"
+                }, 0);
+
+                // Transition out of About into Community (Rapid)
+                tl.to('.about-text-container', { scale: 1.5, opacity: 0, filter: 'blur(10px)', duration: 0.8 }, 2.0)
+                  .to('.about-bg-video', { scale: 2, opacity: 0, duration: 0.8 }, 2.0);
             }
 
-            // SCENE 3: COMMUNITY (Horizontal Scroll - Desktop Only logic)
-            buildCommunityScene() {
-                const wrapper = document.querySelector('.horizontal-scroll-wrapper');
-                const section = document.querySelector('#scene-community');
-                
+            // SHOT 4: COMMUNITY -> Rapid Edit Sequence
+            buildCommunity() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: wrapper,
+                        trigger: '#s-community',
                         start: 'top top',
-                        end: () => `+=${section.offsetWidth - window.innerWidth}`,
+                        end: '+=250%',
                         scrub: true,
                         pin: true,
-                        anticipatePin: 1
                     }
                 });
 
-                // Move container left
-                tl.to(section, {
-                    x: () => -(section.offsetWidth - window.innerWidth),
-                    ease: "none"
+                // Grid slams in
+                tl.to('.comm-grid', { scale: 1, opacity: 1, duration: 0.5, ease: "power4.out" }, 0);
+                
+                // Rapidly colorize and pop images (hyper-lapse feel)
+                const items = document.querySelectorAll('.comm-item img');
+                items.forEach((img, i) => {
+                    tl.to(img, { filter: 'grayscale(0%)', scale: 1, duration: 0.2 }, 0.2 + (i * 0.1));
                 });
 
-                // Add parallax to images inside the panels as they scroll horizontally
-                const images = gsap.utils.toArray('.comm-img');
-                images.forEach(img => {
-                    gsap.to(img, {
-                        x: 100,
-                        scale: 1.1,
-                        filter: 'grayscale(0%)',
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: img.parentElement,
-                            containerAnimation: tl,
-                            start: "left right",
-                            end: "right left",
-                            scrub: true
-                        }
-                    });
-                });
+                // Typography flashes rapidly (ONE -> BODY -> FAMILY)
+                const words = document.querySelectorAll('.comm-huge-word');
+                tl.to(words[0], { opacity: 0, duration: 0.1 }, 1.0) // ONE out
+                  .to(words[1], { opacity: 1, duration: 0.1 }, 1.0) // BODY in
+                  .to(words[1], { opacity: 0, duration: 0.1 }, 1.4) // BODY out
+                  .to(words[2], { opacity: 1, duration: 0.1 }, 1.4); // FAMILY in
+
+                // Wipe out hard to next scene
+                tl.to('#s-community', { opacity: 0, duration: 0.5 }, 2.0);
             }
 
-            // SCENE 4: SYDNEY URBAN TRANSITION
-            buildSydneyScene() {
+            // SHOT 5: SYDNEY -> Reflection & Parallax
+            buildSydney() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '#scene-sydney',
+                        trigger: '#s-sydney',
                         start: 'top top',
                         end: '+=150%',
                         scrub: true,
@@ -845,50 +866,47 @@
                     }
                 });
 
-                // Circular mask reveal of the city
-                tl.to('.sydney-wrapper', { clipPath: 'circle(150% at 50% 50%)', duration: 2, ease: "power2.inOut" })
-                  .to('.sydney-bg', { filter: 'brightness(1)', scale: 1.1, duration: 2 }, "<")
-                  .to('.syd-text-1', { opacity: 1, y: -20, duration: 1 })
-                  .to('.syd-text-2', { opacity: 1, scale: 1.2, duration: 1.5, ease: "back.out(1.7)" }, "-=0.5");
+                // Background scales up and brightens
+                tl.to('.syd-bg', { scale: 1.2, filter: 'brightness(1) saturate(1.2)', duration: 2, ease: "none" }, 0)
+                  // Huge text parallax moves opposite to background
+                  .fromTo('.syd-huge', { y: '50vh' }, { y: '-50vh', duration: 2, ease: "none" }, 0);
             }
 
-            // SCENE 5: EVENTS (3D Depth Typography)
-            buildEventsScene() {
-                const items = gsap.utils.toArray('.event-item');
-                
+            // SHOT 6: EVENTS -> High Speed Z-Axis Acceleration
+            buildEvents() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '#scene-events',
+                        trigger: '#s-events',
                         start: 'top top',
-                        end: '+=200%',
+                        end: '+=300%', // Long scrub for multiple items
                         scrub: true,
                         pin: true,
                     }
                 });
 
-                items.forEach((item, i) => {
-                    tl.to(item, {
-                        z: 200, 
-                        rotateX: 0,
-                        opacity: 1,
-                        color: '#e2c08d',
-                        duration: 1,
-                        ease: "power2.out"
-                    })
-                    .to(item, {
-                        z: 800,
-                        opacity: 0,
-                        duration: 1,
-                        ease: "power2.in"
-                    });
+                const cards = document.querySelectorAll('.event-card');
+                
+                cards.forEach((card, i) => {
+                    // Fly from deep Z towards camera, then past it
+                    const startTime = i * 1.5;
+                    
+                    tl.fromTo(card, 
+                        { z: -3000, opacity: 0 }, 
+                        { z: 0, opacity: 1, duration: 1, ease: "power2.inOut" }, 
+                        startTime
+                    )
+                    // Animate the line drawing as it gets close
+                    .to(card.querySelector('.event-line'), { width: '100%', duration: 0.5 }, startTime + 0.5)
+                    // Fly past camera
+                    .to(card, { z: 1500, opacity: 0, duration: 0.8, ease: "power2.in" }, startTime + 1.2);
                 });
             }
 
-            // SCENE 6: FINALE CLIMAX
-            buildFinaleScene() {
+            // SHOT 7: FINALE -> Visual Climax (Whiteout) -> Footer
+            buildFinale() {
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '#scene-finale',
+                        trigger: '#s-finale',
                         start: 'top top',
                         end: '+=100%',
                         scrub: true,
@@ -896,41 +914,43 @@
                     }
                 });
 
-                // Blinding light expanding
-                tl.to('.finale-light', { scale: 50, opacity: 1, duration: 2, ease: "power4.inOut" })
-                  // Content appears out of the light (using difference blend or just fading)
-                  .to('.finale-content', { opacity: 1, y: 0, duration: 1 }, "-=0.5")
-                  // Background goes white
-                  .to('#scene-finale', { backgroundColor: '#f8f8f8', color: '#050505', duration: 0.1 }, "-=1")
-                  .to('.btn-magnetic', { borderColor: '#050505', color: '#050505', duration: 0.1 }, "<");
+                // 1. Text reveals
+                tl.to('.finale-msg', { opacity: 1, y: -20, duration: 1 }, 0);
+                
+                // 2. Light burst expands to consume screen
+                tl.to('.finale-light', { scale: 50, duration: 1.5, ease: "power4.inOut" }, 1.0)
+                  
+                // 3. Scene cuts to pure white, text inverts
+                  .to('#s-finale', { backgroundColor: var('--c-light'), duration: 0.1 }, 2.0)
+                  .to('.finale-content', { filter: 'invert(1)', duration: 0.1 }, 2.0);
             }
         }
 
         // ------------------------------------------------------------
-        // 7. INITIALISATION & LOADING
+        // 5. INITIALISATION (THE PROJECTOR STARTS)
         // ------------------------------------------------------------
         window.addEventListener('load', () => {
-            // Loader Animation
-            const tl = gsap.timeline({
+            // Drop the loading curtain
+            const curtainTl = gsap.timeline({
                 onComplete: () => {
-                    document.getElementById('loader').style.display = 'none';
-                    initApp();
+                    document.getElementById('curtain').style.display = 'none';
+                    // Boot engines
+                    new CursorSystem();
+                    new Atmosphere();
+                    new CinematicDirector();
+                    document.querySelector('.nav-logo').classList.add('loaded');
                 }
             });
 
-            tl.to('.loader-text span', { y: 0, duration: 1, ease: "power4.out" })
-              .to('.loader-bar', { width: '100%', duration: 1.5, ease: "power2.inOut" })
-              .to('#loader', { yPercent: -100, duration: 1, ease: "power4.inOut", delay: 0.2 });
+            // Awaken text staggers in
+            curtainTl.to('.curtain-text span', { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out" })
+                     // Hold a beat
+                     .to({}, { duration: 0.5 })
+                     // Text explodes/blurs out
+                     .to('.curtain-text', { scale: 2, filter: 'blur(10px)', opacity: 0, duration: 0.8, ease: "power2.in" })
+                     // Curtain lifts
+                     .to('#curtain', { yPercent: -100, duration: 1.2, ease: "expo.inOut" }, "-=0.4");
         });
-
-        function initApp() {
-            new InteractionSystem();
-            new WebGLEngine();
-            new SceneManager();
-            
-            // Force ScrollTrigger refresh after setup
-            ScrollTrigger.refresh();
-        }
 
     </script>
 </body>
