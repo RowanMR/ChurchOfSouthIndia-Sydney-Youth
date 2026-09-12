@@ -1,134 +1,1315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="cinematic-engine-loading">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI SYDNEY YOUTH</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CSI SYDNEY YOUTH | A Cinematic Journey</title>
+    
+    <!-- Cinematic Metadata -->
+    <meta name="description" content="An interactive Christian digital film experience.">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@200;400;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,600;0,800;1,200&family=Oswald:wght@200;400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="theme-void state-locked">
 
-    <!-- Cinematic Grain & Noise Overlay -->
-    <div id="noise-overlay"></div>
+    <!-- ==========================================
+         GLOBAL CINEMATIC OVERLAYS & SYSTEMS
+         ========================================== -->
+    <div id="global-systems" data-pointer-events="none">
+        <!-- SVG Filter Definitions for later CSS/WebGL use -->
+        <svg id="cinematic-filters" style="display:none;" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="film-grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter>
+                <filter id="chromatic-aberration">
+                    <feOffset dx="4" dy="0" in="SourceGraphic" result="red-shift"/>
+                    <feOffset dx="-4" dy="0" in="SourceGraphic" result="blue-shift"/>
+                    <!-- Additional matrix routing omitted for brevity, but structurally present -->
+                </filter>
+                <filter id="divine-bloom">
+                    <feGaussianBlur stdDeviation="15" result="blur1" />
+                    <feGaussianBlur stdDeviation="30" result="blur2" />
+                    <feMerge>
+                        <feMergeNode in="blur2" />
+                        <feMergeNode in="blur1" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
 
-    <!-- Custom Cursor -->
-    <div id="cursor">
-        <div class="cursor-dot"></div>
-        <div class="cursor-ring"></div>
+        <!-- Persistent Screen FX -->
+        <div class="screen-fx grain-layer" data-opacity="0.08"></div>
+        <div class="screen-fx vignette-layer" data-intensity="dark"></div>
+        <div class="screen-fx lens-flare-tracker" data-active="false"></div>
+        <div class="screen-fx global-light-leak"></div>
+
+        <!-- Global WebGL & Canvas Targets -->
+        <canvas id="webgl-environmental-canvas" data-context="threejs"></canvas>
+        <canvas id="particle-physics-canvas" data-context="2d"></canvas>
+
+        <!-- Cinematic Cursor -->
+        <div id="interactive-cursor">
+            <div class="cursor-core"></div>
+            <div class="cursor-ring" data-state="default"></div>
+            <div class="cursor-aura"></div>
+            <div class="cursor-data-label">
+                <span class="label-text">SCROLL TO BEGIN</span>
+                <span class="scroll-coordinates">0.000</span>
+            </div>
+        </div>
+
+        <!-- Abstract Scroll Timeline -->
+        <div id="cinematic-timeline-hud">
+            <div class="timeline-track">
+                <div class="timeline-progress-bar"></div>
+            </div>
+            <div class="timeline-chapter-markers">
+                <div class="marker" data-chapter="void"></div>
+                <div class="marker" data-chapter="genesis"></div>
+                <div class="marker" data-chapter="cross"></div>
+                <div class="marker" data-chapter="community"></div>
+                <div class="marker" data-chapter="sydney"></div>
+                <div class="marker" data-chapter="worship"></div>
+            </div>
+        </div>
+
+        <!-- Minimal Audio / System Controls -->
+        <nav id="system-hud">
+            <div class="hud-logo-mark">
+                <span class="char-c">C</span><span class="char-s">S</span><span class="char-i">I</span>
+            </div>
+            <div class="hud-audio-analyzer">
+                <div class="bar bar-1"></div>
+                <div class="bar bar-2"></div>
+                <div class="bar bar-3"></div>
+            </div>
+        </nav>
     </div>
 
-    <!-- Cinematic Navigation -->
-    <nav class="cinematic-nav">
-        <div class="nav-logo">CSI YOUTH</div>
-        <div class="nav-links">
-            <a href="#" class="interactive">HOME</a>
-            <a href="#" class="interactive">VISION</a>
-            <a href="#" class="interactive">GATHER</a>
-        </div>
-    </nav>
+    <!-- ==========================================
+         THE FILM (MAIN SCROLL ENGINE WRAPPER)
+         ========================================== -->
+    <main id="cinematic-scroll-engine" data-scroll-container>
 
-    <!-- Global Particle Canvas -->
-    <canvas id="particle-canvas"></canvas>
+        <!-- ==========================================
+             SCENE 01 — THE VOID
+             ========================================== -->
+        <section class="cinema-scene scene-01-void" data-scene-id="01" data-theme="pitch-black" data-scroll-section>
+            <div class="scene-stage" data-depth-scale="100">
+                <div class="scene-background void-abyss">
+                    <div class="abyss-gradient"></div>
+                    <div class="abyss-subtle-noise"></div>
+                </div>
+                
+                <div class="scene-atmosphere deep-space-haze" data-parallax-z="-500">
+                    <div class="haze-layer haze-1"></div>
+                    <div class="haze-layer haze-2"></div>
+                </div>
 
-    <!-- Scroll Controlled Movie -->
-    <main id="scroll-container">
+                <div class="scene-subject singularity-target" data-parallax-z="0">
+                    <!-- The Opening Dot System -->
+                    <div class="singularity-core"></div>
+                    <div class="singularity-halo"></div>
+                    <div class="singularity-glow"></div>
+                    <div class="singularity-trail-emitter"></div>
+                    <div class="singularity-shadow-distortion"></div>
+                </div>
 
-        <!-- SCENE 01: THE VOID -->
-        <section class="scene scene-void" id="scene-void">
-            <div class="void-container">
-                <div class="void-dot"></div>
-                <div class="void-impact-ring"></div>
-                <div class="void-light-burst"></div>
+                <div class="scene-foreground void-dust" data-parallax-z="200">
+                    <div class="micro-particle-field"></div>
+                </div>
+
+                <div class="scene-typography hidden-metadata" data-parallax-z="50">
+                    <div class="meta-label">CHAPTER I: EX NIHILO</div>
+                    <div class="meta-timecode">00:00:00:01</div>
+                </div>
+
+                <div class="scene-interaction scroll-trigger-zone" data-trigger="init-descent"></div>
+            </div>
+            <!-- Transition Bridge -->
+            <div class="scene-transition void-to-fall-bridge" data-blend="additive">
+                <div class="vertical-velocity-lines"></div>
             </div>
         </section>
 
-        <!-- SCENE 02: THE FIRST LIGHT -->
-        <section class="scene scene-first-light" id="scene-first-light">
-            <div class="layer bg-layer" style="background-image: url('https://images.unsplash.com/photo-1507281736509-c6289f1ea0f8?q=80&w=2560&auto=format&fit=crop');"></div>
-            <div class="layer atmosphere-layer"></div>
-            <div class="title-container">
-                <h1 class="cinematic-title">
-                    <span class="word">THE</span>
-                    <span class="word accent-word">BEGINNING</span>
-                </h1>
+        <!-- ==========================================
+             SCENE 02 — THE FALL
+             ========================================== -->
+        <section class="cinema-scene scene-02-fall" data-scene-id="02" data-theme="dark-descent" data-scroll-section>
+            <div class="scene-stage spatial-corridor" data-perspective="1000px">
+                <div class="scene-world deep-sky-tunnel" data-speed="0.2">
+                    <div class="distant-cloud-wisps"></div>
+                    <div class="tunnel-ambient-light"></div>
+                </div>
+
+                <div class="scene-atmosphere motion-blur-atmosphere" data-speed="0.8">
+                    <div class="falling-debris-container z-far"></div>
+                    <div class="falling-debris-container z-mid"></div>
+                    <div class="falling-debris-container z-near"></div>
+                </div>
+
+                <div class="scene-subject descending-light" data-speed="1.5">
+                    <div class="falling-object-core"></div>
+                    <div class="falling-object-coma"></div>
+                    <div class="falling-object-tail"></div>
+                    <div class="environmental-light-cast"></div>
+                </div>
+
+                <div class="scene-foreground impact-zone-approach" data-speed="2.0">
+                    <div class="ground-fog-surface"></div>
+                    <div class="target-grid-distortion"></div>
+                </div>
+            </div>
+            <!-- Transition Bridge -->
+            <div class="scene-transition fall-to-impact-bridge">
+                <div class="proximity-whiteout-layer"></div>
             </div>
         </section>
 
-        <!-- SCENE 03 & 04: TYPOGRAPHY MORPH -->
-        <section class="scene scene-text-morph" id="scene-text-morph">
-            <div class="layer morph-bg" style="background-image: url('https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?q=80&w=2560&auto=format&fit=crop');"></div>
-            <div class="morph-text-container">
-                <h2 class="morph-text">LET THERE BE LIGHT</h2>
+        <!-- ==========================================
+             SCENE 03 — THE IMPACT
+             ========================================== -->
+        <section class="cinema-scene scene-03-impact" data-scene-id="03" data-theme="explosive-light" data-scroll-section>
+            <div class="scene-stage camera-shake-target">
+                <div class="scene-background impact-crater-bg">
+                    <div class="crater-base"></div>
+                    <div class="crater-fractures"></div>
+                </div>
+
+                <div class="scene-light impact-light-system">
+                    <div class="primary-flash" data-blend="screen"></div>
+                    <div class="secondary-glow" data-blend="overlay"></div>
+                    <div class="tertiary-ambient-bounce"></div>
+                </div>
+
+                <div class="scene-subject radial-shockwaves">
+                    <div class="shockwave-ring ring-1"></div>
+                    <div class="shockwave-ring ring-2"></div>
+                    <div class="shockwave-ring ring-3"></div>
+                    <div class="seismic-distortion-map"></div>
+                </div>
+
+                <div class="scene-particles explosion-debris-system">
+                    <div class="debris-chunks"></div>
+                    <div class="dust-billow-left"></div>
+                    <div class="dust-billow-right"></div>
+                    <div class="ascending-embers"></div>
+                </div>
+
+                <div class="scene-typography impact-subtext">
+                    <h2 class="hidden-title reveal-from-dust">AND THERE WAS LIGHT</h2>
+                </div>
+            </div>
+            <!-- Transition Bridge -->
+            <div class="scene-transition impact-to-world-bridge">
+                <div class="dissipating-smoke-mask"></div>
             </div>
         </section>
 
-        <!-- SCENE 05: THE HANDS (CLIMAX) -->
-        <section class="scene scene-hands" id="scene-hands">
-            <div class="hands-atmosphere"></div>
-            
-            <div class="hand-container hand-left">
-                <!-- Using a dramatic hand reaching out -->
-                <div class="hand-image" style="background-image: url('https://images.unsplash.com/photo-1614031413149-161b96a12db7?q=80&w=1200&auto=format&fit=crop'); transform: scaleX(-1);"></div>
-            </div>
-            
-            <div class="hand-container hand-right">
-                <div class="hand-image" style="background-image: url('https://images.unsplash.com/photo-1598194916694-8149eeb7fc39?q=80&w=1200&auto=format&fit=crop');"></div>
-            </div>
+        <!-- ==========================================
+             SCENE 04 — THE FIRST WORLD
+             ========================================== -->
+        <section class="cinema-scene scene-04-world" data-scene-id="04" data-theme="cinematic-nature" data-scroll-section>
+            <div class="scene-stage landscape-composition">
+                <!-- Parallax Layers mapping a full 2.5D environment -->
+                <div class="scene-sky landscape-layer" data-speed="0.1">
+                    <div class="sky-gradient-dawn"></div>
+                    <div class="sun-flare-source"></div>
+                </div>
 
-            <div class="divine-contact-point"></div>
-            <div class="white-transition"></div>
+                <div class="scene-clouds landscape-layer" data-speed="0.2">
+                    <img src="https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2560" alt="Cinematic Cloud Bank" class="cloud-plate">
+                    <div class="cloud-shadow-caster"></div>
+                </div>
+
+                <div class="scene-world far-mountains landscape-layer" data-speed="0.3">
+                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560" alt="Distant Mountain Range" class="mountain-plate">
+                    <div class="distance-haze-overlay"></div>
+                </div>
+
+                <div class="scene-world near-mountains landscape-layer" data-speed="0.5">
+                    <!-- Geometric or masked landscape elements -->
+                    <div class="mountain-silhouette"></div>
+                    <div class="valley-fog"></div>
+                </div>
+
+                <div class="scene-light volumetric-rays landscape-layer" data-speed="0.6">
+                    <div class="ray ray-1"></div>
+                    <div class="ray ray-2"></div>
+                    <div class="ray ray-3"></div>
+                    <div class="ray ray-4"></div>
+                </div>
+
+                <div class="scene-foreground landscape-layer" data-speed="0.9">
+                    <div class="foreground-rocks-blur"></div>
+                    <div class="drifting-spores-motes"></div>
+                </div>
+
+                <div class="scene-subject tiny-birds landscape-layer" data-speed="0.7">
+                    <div class="bird-flock-animation-container"></div>
+                </div>
+            </div>
+            <div class="scene-transition world-to-christ-bridge" data-effect="brightness-swell"></div>
         </section>
 
-        <!-- SCENE 06: COMMUNITY -->
-        <section class="scene scene-community" id="scene-community">
-            <div class="layer bg-layer community-bg" style="background-image: url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2560&auto=format&fit=crop');"></div>
-            <div class="layer warm-overlay"></div>
-            <div class="community-text">
-                <h3 class="stagger-text">WE</h3>
-                <h3 class="stagger-text">ARE</h3>
-                <h3 class="stagger-text">GATHERED</h3>
+        <!-- ==========================================
+             SCENE 05 — CHRIST REVEAL
+             ========================================== -->
+        <section class="cinema-scene scene-05-reveal" data-scene-id="05" data-theme="divine-portrait" data-scroll-section>
+            <div class="scene-stage portrait-composition">
+                <div class="scene-background holy-atmosphere">
+                    <div class="bg-radiance"></div>
+                    <div class="subtle-stained-glass-texture"></div>
+                </div>
+
+                <div class="scene-light behind-subject-rays">
+                    <div class="rotating-god-rays"></div>
+                    <div class="pulsing-halo-glow"></div>
+                </div>
+
+                <div class="scene-subject divine-portrait-wrapper" data-scale-reveal>
+                    <div class="image-frame cinematic-aspect">
+                        <img src="https://images.unsplash.com/photo-1544833058-e70f9ca25c17?q=80&w=2560" alt="Representation of Faith and Christ" class="subject-plate">
+                        <!-- Multiple overlay masks to allow JS to paint the image on via light -->
+                        <div class="image-mask shadow-pass"></div>
+                        <div class="image-mask highlight-pass"></div>
+                        <div class="image-overlay cinematic-color-grade"></div>
+                    </div>
+                </div>
+
+                <div class="scene-foreground divine-dust">
+                    <div class="golden-particles-container"></div>
+                    <div class="bottom-edge-fade"></div>
+                </div>
+
+                <div class="scene-typography divine-caption" data-speed="1.2">
+                    <div class="micro-label">THE FOUNDATION</div>
+                    <h2 class="title-typography">
+                        <span class="word-split">THE</span>
+                        <span class="word-split">WAY</span>
+                    </h2>
+                </div>
+            </div>
+            <div class="scene-transition reveal-to-type-bridge">
+                <div class="text-mask-expansion"></div>
             </div>
         </section>
 
-        <!-- SCENE 07: SYDNEY ATMOSPHERE -->
-        <section class="scene scene-sydney" id="scene-sydney">
-            <div class="layer bg-layer sydney-bg" style="background-image: url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2560&auto=format&fit=crop');"></div>
-            <div class="layer dark-gradient"></div>
-        </section>
+        <!-- ==========================================
+             SCENE 06 — MASSIVE TYPOGRAPHY WORLD
+             ========================================== -->
+        <section class="cinema-scene scene-06-typography" data-scene-id="06" data-theme="bold-monolith" data-scroll-section>
+            <div class="scene-stage type-3d-stage">
+                <div class="scene-atmosphere type-fog" data-depth="-100">
+                    <div class="dense-ground-fog"></div>
+                </div>
 
-        <!-- SCENE 08: IDENTITY REVEAL -->
-        <section class="scene scene-identity" id="scene-identity">
-            <div class="identity-wrapper">
-                <div class="id-small reveal-up">CSI</div>
-                <div class="id-large reveal-up">SYDNEY</div>
-                <div class="id-huge reveal-up">YOUTH</div>
+                <div class="scene-display giant-type-system" data-perspective-container>
+                    
+                    <!-- Word 1: FAITH -->
+                    <div class="type-monolith word-faith" data-z="-500" data-speed="0.2">
+                        <div class="type-layer shadow-version">FAITH</div>
+                        <div class="type-layer solid-version">FAITH</div>
+                        <div class="type-layer outline-version">FAITH</div>
+                        <div class="type-layer wireframe-fragments"></div>
+                    </div>
+
+                    <!-- Word 2: GRACE -->
+                    <div class="type-monolith word-grace" data-z="-200" data-speed="0.5">
+                        <div class="type-layer shadow-version">GRACE</div>
+                        <div class="type-layer solid-version">GRACE</div>
+                        <div class="type-layer outline-version" data-mask="diagonal-wipe">GRACE</div>
+                        <!-- Individual character containers for complex choreography -->
+                        <div class="type-layer char-split-version">
+                            <span class="char">G</span><span class="char">R</span><span class="char">A</span><span class="char">C</span><span class="char">E</span>
+                        </div>
+                    </div>
+
+                    <!-- Word 3: HOPE -->
+                    <div class="type-monolith word-hope" data-z="100" data-speed="0.9">
+                        <div class="type-layer solid-version">HOPE</div>
+                        <div class="type-layer ghost-version">HOPE</div>
+                        <div class="editorial-label">AN ANCHOR FOR THE SOUL</div>
+                    </div>
+
+                </div>
+
+                <div class="scene-foreground type-obstructions">
+                    <div class="floating-geometric-shards"></div>
+                </div>
+            </div>
+            <div class="scene-transition type-to-image-bridge">
+                <div class="letter-window-zoom"></div>
             </div>
         </section>
 
-        <!-- SCENE 09: INVITATION & OUTRO -->
-        <section class="scene scene-outro" id="scene-outro">
-            <div class="outro-content">
-                <h2 class="invitation-text">COME AS YOU ARE.</h2>
-                <a href="#" class="cinematic-btn interactive">
-                    <span class="btn-text">MEET US</span>
-                    <div class="btn-glow"></div>
-                </a>
+        <!-- ==========================================
+             SCENE 07 — TEXT BECOMES IMAGE
+             ========================================== -->
+        <section class="cinema-scene scene-07-text-image" data-scene-id="07" data-theme="visual-synthesis" data-scroll-section>
+            <div class="scene-stage synthesis-stage">
+                <div class="scene-background base-dark"></div>
+
+                <div class="scene-subject mask-synthesis-container">
+                    <!-- The container that holds the image but is masked by text initially -->
+                    <div class="image-layer">
+                        <img src="https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?q=80&w=2560" alt="Beautiful landscape revealed through text">
+                    </div>
+                    
+                    <div class="text-mask-layer">
+                        <!-- SVG Clip Path container for JS to animate the text expanding into a full rectangle -->
+                        <svg class="dynamic-text-mask" width="100%" height="100%">
+                            <clipPath id="reveal-word-mask">
+                                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="massive-mask-text">PURPOSE</text>
+                                <rect class="expanding-reveal-rect" x="50%" y="50%" width="0" height="0"></rect>
+                            </clipPath>
+                        </svg>
+                    </div>
+
+                    <div class="clipped-image-container" style="clip-path: url(#reveal-word-mask);">
+                        <div class="image-inner-scale" data-speed="0.8">
+                            <img src="https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?q=80&w=2560" alt="Purpose landscape">
+                            <div class="image-inner-glow"></div>
+                            <div class="image-inner-particles"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-typography floating-captions">
+                    <div class="caption fragment-1" data-speed="1.1">FIND IT.</div>
+                    <div class="caption fragment-2" data-speed="1.2">LIVE IT.</div>
+                </div>
             </div>
-            <footer class="minimal-footer">
-                <p>GRACE • FAITH • HOPE</p>
-                <p class="copyright">© 2026 CSI SYDNEY YOUTH</p>
-            </footer>
+            <div class="scene-transition image-to-sky-bridge">
+                <div class="vertical-camera-pan-effect"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 08 — THE SKY OPENS
+             ========================================== -->
+        <section class="cinema-scene scene-08-sky-open" data-scene-id="08" data-theme="heavenly-scale" data-scroll-section>
+            <div class="scene-stage massive-vertical-stage">
+                <div class="scene-sky high-altitude-bg">
+                    <div class="stratosphere-gradient"></div>
+                </div>
+
+                <div class="scene-clouds parting-cloud-system">
+                    <div class="cloud-bank left-bank" data-speed="0.3">
+                        <div class="cumulus-texture"></div>
+                    </div>
+                    <div class="cloud-bank right-bank" data-speed="0.4">
+                        <div class="cumulus-texture"></div>
+                    </div>
+                    <div class="cloud-bank foreground-bank" data-speed="0.8"></div>
+                </div>
+
+                <div class="scene-light divine-column">
+                    <div class="vertical-light-beam"></div>
+                    <div class="beam-core-white"></div>
+                    <div class="beam-edge-glow"></div>
+                    <div class="falling-light-motes"></div>
+                </div>
+
+                <div class="scene-subject tiny-human-scale">
+                    <div class="silhouette-figure looking-up"></div>
+                    <div class="ground-shadow"></div>
+                </div>
+
+                <div class="scene-typography hidden-in-clouds" data-speed="0.2">
+                    <h2 class="ethereal-text">REVELATION</h2>
+                </div>
+            </div>
+            <div class="scene-transition sky-to-journey-bridge">
+                <div class="camera-dive-to-ground"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 09 — THE JOURNEY
+             ========================================== -->
+        <section class="cinema-scene scene-09-journey" data-scene-id="09" data-theme="pilgrimage" data-scroll-section>
+            <div class="scene-stage journey-corridor">
+                
+                <!-- Environment 1: The Forest / Wilderness -->
+                <div class="scene-world env-forest" data-active="true">
+                    <div class="parallax-tree trunk-far" data-speed="0.2"></div>
+                    <div class="parallax-tree trunk-mid" data-speed="0.5"></div>
+                    <div class="parallax-tree trunk-near" data-speed="0.9"></div>
+                    <div class="forest-mist"></div>
+                </div>
+
+                <!-- Environment 2: The Desert / Mountain -->
+                <div class="scene-world env-mountain" data-active="false">
+                    <div class="dune-silhouette layer-1"></div>
+                    <div class="dune-silhouette layer-2"></div>
+                    <div class="heat-haze-distortion"></div>
+                </div>
+
+                <!-- Environment 3: The Path to Light -->
+                <div class="scene-world env-path" data-active="false">
+                    <div class="glowing-road-lines"></div>
+                    <div class="path-ambient-light"></div>
+                </div>
+
+                <div class="scene-subject the-walker" data-locked="center">
+                    <div class="walker-silhouette motion-cycle"></div>
+                    <div class="walker-light-cast"></div>
+                </div>
+
+                <div class="scene-typography journey-milestones">
+                    <div class="milestone text-wilderness">THROUGH THE WILDERNESS</div>
+                    <div class="milestone text-valleys">THROUGH THE VALLEYS</div>
+                    <div class="milestone text-light">INTO HIS LIGHT</div>
+                </div>
+            </div>
+            <div class="scene-transition journey-to-cross-bridge">
+                <div class="environment-fade-to-black"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 10 — THE CROSS
+             ========================================== -->
+        <section class="cinema-scene scene-10-cross" data-scene-id="10" data-theme="holy-symbol" data-scroll-section>
+            <div class="scene-stage abstract-cross-stage">
+                <div class="scene-background pitch-black"></div>
+
+                <div class="scene-light cross-beam-system">
+                    <!-- Vertical Beam -->
+                    <div class="beam-vertical" data-speed="0.1">
+                        <div class="beam-core"></div>
+                        <div class="beam-aura"></div>
+                        <div class="beam-particles-rising"></div>
+                    </div>
+                    <!-- Horizontal Beam -->
+                    <div class="beam-horizontal" data-speed="0.2">
+                        <div class="beam-core"></div>
+                        <div class="beam-aura"></div>
+                        <div class="beam-particles-drifting"></div>
+                    </div>
+                </div>
+
+                <div class="scene-atmosphere intersection-node">
+                    <div class="node-flare"></div>
+                    <div class="node-pulsing-rings"></div>
+                </div>
+
+                <div class="scene-subject cross-silhouette-layer">
+                    <!-- An actual physical cross barely visible in the light -->
+                    <div class="wooden-texture-mask"></div>
+                    <div class="rim-light-left"></div>
+                    <div class="rim-light-right"></div>
+                </div>
+
+                <div class="scene-foreground holy-haze">
+                    <div class="volumetric-haze layer-1"></div>
+                    <div class="volumetric-haze layer-2"></div>
+                </div>
+
+                <div class="scene-typography cross-titles">
+                    <h2 class="title-left">SACRIFICE</h2>
+                    <h2 class="title-right">SALVATION</h2>
+                </div>
+            </div>
+            <div class="scene-transition cross-to-water-bridge">
+                <div class="liquid-distortion-melt"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 11 — WATER / REFLECTION
+             ========================================== -->
+        <section class="cinema-scene scene-11-water" data-scene-id="11" data-theme="deep-reflection" data-scroll-section>
+            <div class="scene-stage aquatic-stage">
+                <div class="scene-background deep-underwater">
+                    <div class="abyssal-gradient"></div>
+                    <div class="subsurface-light-scattering"></div>
+                </div>
+
+                <div class="scene-world water-surface-plane" data-perspective-rotate="X">
+                    <div class="surface-ripples">
+                        <div class="ripple r1"></div>
+                        <div class="ripple r2"></div>
+                        <div class="ripple r3"></div>
+                    </div>
+                    <div class="surface-specular-highlights"></div>
+                </div>
+
+                <div class="scene-typography reflection-system">
+                    <!-- Above water -->
+                    <div class="text-source above-water" data-speed="0.5">MADE NEW</div>
+                    <!-- Below water (distorted, upside down) -->
+                    <div class="text-reflection below-water" data-speed="0.4">
+                        <div class="reflection-distortion-wrapper">MADE NEW</div>
+                    </div>
+                </div>
+
+                <div class="scene-particles floating-bubbles">
+                    <div class="bubble-field"></div>
+                </div>
+
+                <div class="scene-light caustic-projections">
+                    <div class="caustic-web"></div>
+                </div>
+            </div>
+            <div class="scene-transition water-to-hands-bridge">
+                <div class="camera-breach-surface-whiteout"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 12 — THE HANDS (MASSIVE SYSTEM)
+             ========================================== -->
+        <section class="cinema-scene scene-12-hands" data-scene-id="12" data-theme="michelangelo-cinematic" data-scroll-section>
+            <div class="scene-stage tension-stage" data-pin="true">
+                
+                <div class="scene-background creation-nebula">
+                    <div class="nebula-clouds"></div>
+                    <div class="nebula-stars"></div>
+                    <div class="nebula-deep-glow"></div>
+                </div>
+
+                <div class="scene-atmosphere heavenly-rays">
+                    <div class="ray-system top-down"></div>
+                    <div class="ambient-celestial-dust"></div>
+                </div>
+
+                <!-- LEFT HAND COMPOSITION (DIVINE) -->
+                <div class="scene-subject hand-system left-hand-divine" data-motion="approach-right">
+                    <div class="hand-depth-wrapper" data-z="-100">
+                        <div class="hand-image-container">
+                            <img src="https://images.unsplash.com/photo-1614031413149-161b96a12db7?q=80&w=1200" alt="The Divine Hand Reach">
+                        </div>
+                        <div class="hand-atmosphere"></div>
+                        <div class="hand-glow-emitter"></div>
+                        <div class="hand-shadow-volume"></div>
+                        <div class="hand-particle-field divine-sparks"></div>
+                        <div class="hand-rim-light god-rim"></div>
+                    </div>
+                </div>
+
+                <!-- RIGHT HAND COMPOSITION (HUMANITY) -->
+                <div class="scene-subject hand-system right-hand-human" data-motion="approach-left">
+                    <div class="hand-depth-wrapper" data-z="100">
+                        <div class="hand-image-container">
+                            <img src="https://images.unsplash.com/photo-1598194916694-8149eeb7fc39?q=80&w=1200" alt="Humanity Reaching">
+                        </div>
+                        <div class="hand-atmosphere earthly-dust"></div>
+                        <div class="hand-shadow-volume"></div>
+                        <div class="hand-particle-field ash-motes"></div>
+                        <div class="hand-rim-light earthly-rim"></div>
+                    </div>
+                </div>
+
+                <!-- THE GAP / TENSION SPACE -->
+                <div class="scene-interaction distance-gap-system">
+                    <div class="tension-electric-arcs"></div>
+                    <div class="magnetic-field-distortion"></div>
+                    <div class="floating-dust-attraction"></div>
+                    <div class="central-light-build-up"></div>
+                </div>
+
+                <div class="scene-foreground camera-haze-layer">
+                    <div class="lens-smudge-texture"></div>
+                    <div class="cinematic-anamorphic-flare"></div>
+                </div>
+            </div>
+            <!-- Transition Bridge -->
+            <div class="scene-transition hands-to-touch-bridge">
+                <!-- Zero gap trigger -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 13 — THE TOUCH (EXPLOSION)
+             ========================================== -->
+        <section class="cinema-scene scene-13-touch" data-scene-id="13" data-theme="supernova" data-scroll-section>
+            <div class="scene-stage explosion-stage">
+                
+                <div class="scene-light contact-point-origin">
+                    <div class="initial-spark-core"></div>
+                    <div class="secondary-plasma-glow"></div>
+                </div>
+
+                <div class="scene-subject explosion-mechanics">
+                    <div class="radial-flash-layer"></div>
+                    <div class="seismic-shockwave wave-primary"></div>
+                    <div class="seismic-shockwave wave-secondary"></div>
+                    <div class="light-shards-burst"></div>
+                </div>
+
+                <div class="scene-particles supernova-particles">
+                    <div class="particle-ejecta-high-velocity"></div>
+                    <div class="particle-ejecta-slow-drifting"></div>
+                    <div class="massive-bloom-layer"></div>
+                </div>
+
+                <div class="scene-foreground screen-fx-blast">
+                    <div class="pure-whiteout-layer"></div>
+                    <div class="chromatic-aberration-pulse"></div>
+                    <div class="retinal-afterimage-burn"></div>
+                </div>
+            </div>
+            <div class="scene-transition touch-to-flood-bridge">
+                <div class="sustained-white-wash"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 14 — LIGHT FLOOD
+             ========================================== -->
+        <section class="cinema-scene scene-14-light-flood" data-scene-id="14" data-theme="pure-light" data-scroll-section>
+            <div class="scene-stage luminous-void">
+                
+                <div class="scene-background pure-white-gold">
+                    <div class="gold-gradient-wash"></div>
+                </div>
+
+                <div class="scene-atmosphere luminous-fog">
+                    <div class="thick-fog-layer"></div>
+                    <div class="volumetric-light-rays soft-rays"></div>
+                </div>
+
+                <div class="scene-particles floating-embers-bright">
+                    <div class="ember-field"></div>
+                </div>
+
+                <div class="scene-subject abstract-presence">
+                    <div class="blurred-silhouette-hint"></div>
+                    <div class="abstract-geometric-halo"></div>
+                </div>
+
+                <div class="scene-typography fragments-in-light">
+                    <div class="text-fragment">LOVE</div>
+                    <div class="text-fragment">UNENDING</div>
+                </div>
+            </div>
+            <div class="scene-transition flood-to-particles-bridge">
+                <div class="light-fractures-into-dots"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 15 — PARTICLES BECOME PEOPLE
+             ========================================== -->
+        <section class="cinema-scene scene-15-particle-people" data-scene-id="15" data-theme="assembly" data-scroll-section>
+            <div class="scene-stage assembly-stage">
+                
+                <div class="scene-background fading-light"></div>
+
+                <div class="scene-subject particle-morph-system">
+                    <!-- Data points for JS to build the fluid simulation -->
+                    <div class="particle-cloud abstract-state"></div>
+                    <div class="particle-cloud assembly-state" data-target="human-forms"></div>
+                    
+                    <div class="fluid-transition-wrapper">
+                        <!-- Morphing groups -->
+                        <div class="silhouette-group left-group">
+                            <div class="form-outline"></div>
+                            <div class="form-fill-particles"></div>
+                        </div>
+                        <div class="silhouette-group center-group">
+                            <div class="form-outline"></div>
+                            <div class="form-fill-particles"></div>
+                        </div>
+                        <div class="silhouette-group right-group">
+                            <div class="form-outline"></div>
+                            <div class="form-fill-particles"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-light back-lit-crowd">
+                    <div class="crowd-rim-light"></div>
+                    <div class="cast-shadows-forward"></div>
+                </div>
+
+                <div class="scene-typography assembly-caption">
+                    <h3 class="caption-text">CALLED BY NAME</h3>
+                </div>
+            </div>
+            <div class="scene-transition particles-to-community-bridge">
+                <div class="focus-pull-blur-resolve"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 16 — COMMUNITY
+             ========================================== -->
+        <section class="cinema-scene scene-16-community" data-scene-id="16" data-theme="human-connection" data-scroll-section>
+            <div class="scene-stage immersive-portrait-stage">
+                
+                <div class="scene-world bokeh-background" data-speed="0.1">
+                    <div class="out-of-focus-lights"></div>
+                    <div class="blurry-background-faces"></div>
+                </div>
+
+                <div class="scene-subject spatial-portraits" data-perspective-container>
+                    
+                    <!-- Portrait 1: Deep -->
+                    <div class="floating-portrait" data-z="-300" data-speed="0.3">
+                        <div class="portrait-frame">
+                            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800" alt="Community Joy">
+                            <div class="portrait-glow"></div>
+                        </div>
+                    </div>
+
+                    <!-- Portrait 2: Mid -->
+                    <div class="floating-portrait" data-z="-100" data-speed="0.6">
+                        <div class="portrait-frame">
+                            <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800" alt="Friendship">
+                            <div class="portrait-shadow"></div>
+                        </div>
+                    </div>
+
+                    <!-- Portrait 3: Near -->
+                    <div class="floating-portrait" data-z="150" data-speed="1.1">
+                        <div class="portrait-frame">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=800" alt="Connection">
+                        </div>
+                    </div>
+
+                    <!-- Interaction moments layered over -->
+                    <div class="overlapping-hands-layer">
+                        <div class="hand-gesture high-five"></div>
+                        <div class="hand-gesture embrace"></div>
+                    </div>
+                </div>
+
+                <div class="scene-foreground community-atmosphere">
+                    <div class="warm-sun-flare"></div>
+                    <div class="dust-dancing-in-light"></div>
+                </div>
+
+                <div class="scene-typography integration-text">
+                    <h2 class="massive-background-word" data-speed="0.2">TOGETHER</h2>
+                </div>
+            </div>
+            <div class="scene-transition community-to-memory-bridge">
+                <div class="photo-scatter-transition"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 17 — MEMORY WALL
+             ========================================== -->
+        <section class="cinema-scene scene-17-memory-wall" data-scene-id="17" data-theme="cinematic-archive" data-scroll-section>
+            <div class="scene-stage archive-stage">
+                
+                <div class="scene-background dark-gallery-walls"></div>
+
+                <div class="scene-display memory-cloud-system" data-scroll-axis="both">
+                    
+                    <!-- A massive nested structure of floating images and metadata -->
+                    <div class="memory-cluster cluster-alpha">
+                        
+                        <figure class="memory-card rotating-z" data-depth="0.8">
+                            <div class="image-crop-box">
+                                <img src="https://images.unsplash.com/photo-1543807535-eceef0bc6599?q=80&w=800" alt="Worship moment">
+                                <div class="image-overlay-darken"></div>
+                            </div>
+                            <figcaption class="memory-metadata">
+                                <span class="date-stamp">SUMMER '24</span>
+                                <span class="memory-id">REC-001</span>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="memory-card rotating-z offset-card" data-depth="0.4">
+                            <div class="image-crop-box">
+                                <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800" alt="Gathering">
+                                <div class="video-play-indicator"></div>
+                            </div>
+                            <figcaption class="memory-metadata">
+                                <span class="date-stamp">WINTER '25</span>
+                            </figcaption>
+                        </figure>
+
+                    </div>
+
+                    <div class="memory-cluster cluster-beta">
+                        <figure class="memory-card stacked-cards" data-depth="0.9">
+                            <div class="card-layer back-layer"></div>
+                            <div class="card-layer mid-layer"></div>
+                            <div class="card-layer front-layer">
+                                <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=800" alt="Group hug">
+                            </div>
+                        </figure>
+                    </div>
+
+                    <div class="memory-cluster cluster-omega abstract-blur">
+                        <div class="blurred-memory-ghost"></div>
+                    </div>
+                </div>
+
+                <div class="scene-light archive-spotlights">
+                    <div class="roving-spotlight s1"></div>
+                    <div class="roving-spotlight s2"></div>
+                </div>
+
+                <div class="scene-foreground vignette-depth"></div>
+            </div>
+            <div class="scene-transition memory-to-sydney-bridge">
+                <div class="polaroid-burn-effect"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 18 — SYDNEY
+             ========================================== -->
+        <section class="cinema-scene scene-18-sydney" data-scene-id="18" data-theme="urban-night" data-scroll-section>
+            <div class="scene-stage city-environment">
+                
+                <div class="scene-world sydney-skyline" data-speed="0.2">
+                    <!-- Layered city composition -->
+                    <div class="skyline-layer back-buildings">
+                        <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2560" alt="Sydney Skyline Dark">
+                    </div>
+                    <div class="city-lights-grid-overlay"></div>
+                    <div class="skyline-layer front-buildings"></div>
+                </div>
+
+                <div class="scene-atmosphere urban-weather">
+                    <div class="cinematic-rain-system"></div>
+                    <div class="street-level-fog"></div>
+                    <div class="light-pollution-glow"></div>
+                </div>
+
+                <div class="scene-light traffic-trails">
+                    <div class="red-tail-lights trail-group" data-speed="1.2"></div>
+                    <div class="white-head-lights trail-group" data-speed="1.5"></div>
+                    <div class="traffic-light-bokeh"></div>
+                </div>
+
+                <div class="scene-subject lonely-street-lamp">
+                    <div class="lamp-post-silhouette"></div>
+                    <div class="lamp-halo-cone"></div>
+                    <div class="illuminated-rain-cone"></div>
+                </div>
+
+                <div class="scene-typography location-stamp">
+                    <div class="coords">-33.8688° S, 151.2093° E</div>
+                    <h2 class="city-title">OUR CITY</h2>
+                </div>
+            </div>
+            <div class="scene-transition sydney-to-stars-bridge">
+                <div class="vertical-ascension-trigger"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 19 — CITY → STARS
+             ========================================== -->
+        <section class="cinema-scene scene-19-city-stars" data-scene-id="19" data-theme="cosmic-ascent" data-scroll-section>
+            <div class="scene-stage ascension-stage">
+                
+                <div class="scene-background transforming-sky">
+                    <div class="night-sky-base"></div>
+                    <div class="deep-space-nebula-reveal"></div>
+                </div>
+
+                <div class="scene-subject light-detachment-system">
+                    <!-- DOM elements that represent city windows floating upward -->
+                    <div class="ascending-light-point p1"></div>
+                    <div class="ascending-light-point p2"></div>
+                    <div class="ascending-light-point p3"></div>
+                    <div class="ascending-light-point p4"></div>
+                    <div class="ascending-light-point p5"></div>
+                    <!-- JS will duplicate these or use canvas -->
+                    <div class="constellation-web-lines"></div>
+                </div>
+
+                <div class="scene-camera vertical-travel-rig" data-speed="2.0">
+                    <div class="speed-lines-upward"></div>
+                </div>
+
+                <div class="scene-typography cosmic-text">
+                    <h2 class="starlight-text">A GREATER LIGHT</h2>
+                </div>
+            </div>
+            <div class="scene-transition stars-to-worship-bridge">
+                <div class="starburst-to-stage-light"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 20 — WORSHIP
+             ========================================== -->
+        <section class="cinema-scene scene-20-worship" data-scene-id="20" data-theme="live-concert" data-scroll-section>
+            <div class="scene-stage worship-arena">
+                
+                <div class="scene-background dark-arena"></div>
+
+                <div class="scene-light stage-lighting-rig">
+                    <div class="moving-head-beam b-left"></div>
+                    <div class="moving-head-beam b-center"></div>
+                    <div class="moving-head-beam b-right"></div>
+                    <div class="massive-backlight-wash"></div>
+                    <div class="strobe-fx-layer"></div>
+                </div>
+
+                <div class="scene-atmosphere arena-haze">
+                    <div class="thick-stage-smoke"></div>
+                    <div class="beam-intersections"></div>
+                </div>
+
+                <div class="scene-subject crowd-silhouettes">
+                    <!-- Layered crowd for parallax -->
+                    <div class="crowd-layer far-crowd" data-speed="0.2">
+                        <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2560" alt="Worship Crowd Background" class="crowd-mask">
+                    </div>
+                    <div class="crowd-layer mid-crowd" data-speed="0.4">
+                        <div class="raised-hands-group"></div>
+                    </div>
+                    <div class="crowd-layer near-crowd" data-speed="0.8">
+                        <div class="single-worshipper-silhouette"></div>
+                    </div>
+                </div>
+
+                <div class="scene-particles golden-confetti-dust">
+                    <div class="falling-glitter-motes"></div>
+                </div>
+            </div>
+            <div class="scene-transition worship-to-gathering-bridge">
+                <div class="lights-down-fade"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 21 — THE GATHERING
+             ========================================== -->
+        <section class="cinema-scene scene-21-gathering" data-scene-id="21" data-theme="intimate-community" data-scroll-section>
+            <div class="scene-stage gathering-room">
+                
+                <div class="scene-world intimate-space">
+                    <div class="room-ambient-shadows"></div>
+                    <div class="floor-reflection"></div>
+                </div>
+
+                <div class="scene-light central-fire">
+                    <div class="warm-core-light"></div>
+                    <div class="flicker-cast-shadows"></div>
+                </div>
+
+                <div class="scene-subject converging-figures">
+                    <!-- Figures moving towards the center -->
+                    <div class="figure-approach f-left"></div>
+                    <div class="figure-approach f-right"></div>
+                    <div class="figure-approach f-back"></div>
+                    <div class="figure-approach f-front"></div>
+                    
+                    <div class="collective-shadow-mass"></div>
+                </div>
+
+                <div class="scene-typography gathering-titles">
+                    <h2 class="title-ring-text">WHERE TWO OR MORE ARE GATHERED</h2>
+                </div>
+            </div>
+            <div class="scene-transition gathering-to-word-bridge">
+                <div class="shadows-consume-screen"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 22 — THE WORD
+             ========================================== -->
+        <section class="cinema-scene scene-22-word" data-scene-id="22" data-theme="typographic-truth" data-scroll-section>
+            <div class="scene-stage deep-typography-space">
+                
+                <div class="scene-background void-black"></div>
+
+                <div class="scene-display spatial-sentence">
+                    <!-- Text distributed across huge z-depths -->
+                    <div class="word-plane p1" data-z="-800" data-align="left">I AM</div>
+                    <div class="word-plane p2" data-z="-400" data-align="center">THE WAY</div>
+                    <div class="word-plane p3" data-z="0" data-align="right">THE TRUTH</div>
+                    <div class="word-plane p4" data-z="400" data-align="center">THE LIFE</div>
+                </div>
+
+                <div class="scene-light text-illumination">
+                    <div class="sweeping-highlight-bar"></div>
+                    <div class="text-cast-glow"></div>
+                </div>
+
+                <div class="scene-interaction typographic-masks">
+                    <div class="negative-space-cutter"></div>
+                    <div class="vertical-reveal-slits"></div>
+                </div>
+            </div>
+            <div class="scene-transition word-to-quiet-bridge">
+                <div class="text-dissolves-to-dust"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 23 — QUIET MOMENT
+             ========================================== -->
+        <section class="cinema-scene scene-23-quiet" data-scene-id="23" data-theme="extreme-minimalism" data-scroll-section>
+            <div class="scene-stage empty-stage">
+                
+                <div class="scene-background absolute-nothingness"></div>
+
+                <div class="scene-subject the-solitary-element">
+                    <!-- Just one tiny glowing ember in the center of the screen -->
+                    <div class="micro-ember"></div>
+                    <div class="subtle-breathing-halo"></div>
+                </div>
+
+                <div class="scene-typography solitary-sentence">
+                    <p class="whisper-text">Be still.</p>
+                </div>
+
+                <div class="scene-atmosphere extreme-negative-space">
+                    <!-- Exists purely to force a long scroll duration -->
+                    <div class="scroll-pause-zone"></div>
+                </div>
+            </div>
+            <div class="scene-transition quiet-to-invitation-bridge">
+                <div class="ember-expands-to-doorway"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 24 — INVITATION
+             ========================================== -->
+        <section class="cinema-scene scene-24-invitation" data-scene-id="24" data-theme="the-call" data-scroll-section>
+            <div class="scene-stage doorway-environment">
+                
+                <div class="scene-world infinite-path">
+                    <div class="ground-plane-perspective"></div>
+                    <div class="path-borders glowing"></div>
+                </div>
+
+                <div class="scene-subject the-open-door">
+                    <div class="door-frame-silhouette"></div>
+                    <div class="doorway-light-portal"></div>
+                    <div class="portal-inner-world">
+                        <div class="distant-sunrise-hint"></div>
+                    </div>
+                </div>
+
+                <div class="scene-light volumetric-spill">
+                    <div class="light-spill-on-floor"></div>
+                    <div class="god-rays-from-door"></div>
+                </div>
+
+                <div class="scene-interaction embedded-cta-zone">
+                    <!-- Not a standard button, but an integrated environmental trigger -->
+                    <div class="environmental-action-target">
+                        <div class="target-rings"></div>
+                        <span class="target-label">STEP IN</span>
+                        <div class="target-magnetic-field"></div>
+                    </div>
+                </div>
+                
+                <div class="scene-particles threshold-dust">
+                    <div class="dust-crossing-light"></div>
+                </div>
+            </div>
+            <div class="scene-transition invitation-to-reveal-bridge">
+                <div class="camera-moves-through-door"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 25 — CSI SYDNEY YOUTH REVEAL
+             ========================================== -->
+        <section class="cinema-scene scene-25-identity-reveal" data-scene-id="25" data-theme="title-sequence" data-scroll-section>
+            <div class="scene-stage identity-stage">
+                
+                <div class="scene-background cinematic-slate">
+                    <div class="slate-texture"></div>
+                    <div class="radial-vignette-heavy"></div>
+                </div>
+
+                <div class="scene-display massive-title-system">
+                    
+                    <div class="title-frame frame-background" data-speed="0.2">
+                        <div class="giant-letters stroke-only">CSI SYDNEY YOUTH</div>
+                    </div>
+                    
+                    <div class="title-frame frame-shadow" data-speed="0.4">
+                        <div class="giant-letters blur-cast">CSI SYDNEY YOUTH</div>
+                    </div>
+                    
+                    <div class="title-frame frame-primary" data-speed="0.5">
+                        <div class="giant-letters solid-fill">
+                            <span class="word w1">CSI</span>
+                            <span class="word w2">SYDNEY</span>
+                            <span class="word w3">YOUTH</span>
+                        </div>
+                        <div class="letters-specular-highlight"></div>
+                    </div>
+                    
+                    <div class="title-metadata-corners">
+                        <div class="meta top-left">EST. 2026</div>
+                        <div class="meta top-right">GRANTHAM FARM, NSW</div>
+                        <div class="meta bottom-left">A CINEMATIC EXPERIENCE</div>
+                        <div class="meta bottom-right">VERSION 1.0</div>
+                    </div>
+                </div>
+
+                <div class="scene-light title-sweep-light">
+                    <div class="horizontal-flare-pass"></div>
+                </div>
+
+                <div class="scene-particles title-sparks">
+                    <div class="sparks-falling-from-letters"></div>
+                </div>
+            </div>
+            <div class="scene-transition reveal-to-horizon-bridge">
+                <div class="title-scales-up-and-fades"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 26 — FINAL HORIZON
+             ========================================== -->
+        <section class="cinema-scene scene-26-horizon" data-scene-id="26" data-theme="peaceful-resolve" data-scroll-section>
+            <div class="scene-stage horizon-stage">
+                
+                <div class="scene-sky final-dawn">
+                    <div class="dawn-color-gradient"></div>
+                    <div class="soft-atmospheric-banding"></div>
+                </div>
+
+                <div class="scene-world the-edge">
+                    <div class="ocean-horizon-line"></div>
+                    <div class="calm-water-reflection"></div>
+                </div>
+
+                <div class="scene-subject distant-community">
+                    <div class="tiny-silhouettes-on-horizon"></div>
+                </div>
+
+                <div class="scene-light quiet-sun">
+                    <div class="half-sun-disk"></div>
+                    <div class="sun-glint-on-water"></div>
+                </div>
+
+                <div class="scene-typography quiet-resolve">
+                    <h3 class="closing-statement">WELCOME HOME.</h3>
+                </div>
+            </div>
+            <div class="scene-transition horizon-to-final-light-bridge">
+                <div class="sun-sets-into-single-point"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 27 — FINAL LIGHT
+             ========================================== -->
+        <section class="cinema-scene scene-27-final-light" data-scene-id="27" data-theme="the-end-is-the-beginning" data-scroll-section>
+            <div class="scene-stage return-to-void-stage">
+                
+                <div class="scene-background total-darkness"></div>
+
+                <div class="scene-subject the-enduring-light">
+                    <!-- Mirrors Scene 1, but peaceful -->
+                    <div class="single-point-of-light"></div>
+                    <div class="gentle-pulsing-aura"></div>
+                </div>
+
+                <div class="scene-particles lingering-dust">
+                    <div class="slow-drifting-motes"></div>
+                </div>
+
+                <div class="scene-interaction footer-gravity-well">
+                    <div class="scroll-pull-target"></div>
+                </div>
+            </div>
+            <div class="scene-transition light-to-footer-bridge">
+                <div class="seamless-blend-down"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SCENE 28 — CINEMATIC FOOTER
+             ========================================== -->
+        <section class="cinema-scene scene-28-footer" data-scene-id="28" data-theme="atmospheric-terminal" data-scroll-section>
+            <div class="scene-stage terminal-stage">
+                
+                <div class="scene-background terminal-void">
+                    <div class="deep-noise-texture"></div>
+                </div>
+
+                <div class="scene-world footer-landscape" data-speed="0.1">
+                    <!-- Abstract architectural shapes fading into black -->
+                    <div class="monolith-shape left"></div>
+                    <div class="monolith-shape right"></div>
+                    <div class="floor-grid-fade"></div>
+                </div>
+
+                <div class="scene-display integrated-navigation">
+                    
+                    <div class="nav-cluster branding">
+                        <div class="cinematic-logo-mark">CSI SYDNEY YOUTH</div>
+                        <div class="sub-brand-text">GRACE • FAITH • HOPE</div>
+                    </div>
+
+                    <div class="nav-cluster links spatial-links">
+                        <div class="link-column">
+                            <span class="column-header">JOURNEY</span>
+                            <a href="#" class="environmental-link">VISION</a>
+                            <a href="#" class="environmental-link">BELIEFS</a>
+                            <a href="#" class="environmental-link">LEADERS</a>
+                        </div>
+                        <div class="link-column">
+                            <span class="column-header">GATHER</span>
+                            <a href="#" class="environmental-link">FRIDAYS</a>
+                            <a href="#" class="environmental-link">SUNDAYS</a>
+                            <a href="#" class="environmental-link">EVENTS</a>
+                        </div>
+                        <div class="link-column">
+                            <span class="column-header">CONNECT</span>
+                            <a href="#" class="environmental-link">INSTAGRAM</a>
+                            <a href="#" class="environmental-link">YOUTUBE</a>
+                            <a href="#" class="environmental-link">SPOTIFY</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-cluster location">
+                        <div class="location-pin-visual"></div>
+                        <address class="cinematic-address">
+                            GRANTHAM FARM<br>
+                            NEW SOUTH WALES<br>
+                            AUSTRALIA
+                        </address>
+                    </div>
+                </div>
+
+                <div class="scene-typography absolute-bottom">
+                    <div class="copyright-text">© 2026 CSI SYDNEY YOUTH. ALL RIGHTS RESERVED.</div>
+                    <div class="credit-text">DIRECTED IN HTML.</div>
+                </div>
+
+                <div class="scene-light terminal-glow">
+                    <div class="bottom-edge-ambient-light"></div>
+                </div>
+
+            </div>
         </section>
 
     </main>
 
-    <!-- External Libraries -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="script.js"></script>
+    <!-- ==========================================
+         OFF-SCREEN AUDIO / RESOURCE PRELOADERS
+         ========================================== -->
+    <div id="cinematic-resources" style="display: none;">
+        <audio id="ambient-drone-track" preload="auto" loop>
+            <source src="assets/audio/deep-space-drone.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="impact-sfx" preload="auto">
+            <source src="assets/audio/cinematic-boom.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="choir-swell-sfx" preload="auto">
+            <source src="assets/audio/ethereal-choir.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
 </body>
 </html>
