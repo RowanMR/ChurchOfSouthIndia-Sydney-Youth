@@ -3,245 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI SYDNEY YOUTH | Cinematic Experience</title>
-    
-    <!-- Fonts -->
+    <title>CSI SYDNEY YOUTH</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@200;400;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Global Atmosphere Canvas -->
-    <canvas id="atmosphere-canvas"></canvas>
-    <div class="film-grain"></div>
+    <!-- Cinematic Grain & Noise Overlay -->
+    <div id="noise-overlay"></div>
 
     <!-- Custom Cursor -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"><span class="cursor-text"></span></div>
+    <div id="cursor">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
+    </div>
 
     <!-- Cinematic Navigation -->
-    <nav class="main-nav">
-        <div class="nav-logo" data-magnetic>CSI SYDNEY YOUTH</div>
-        <div class="nav-trigger" data-magnetic data-cursor="MENU">
-            <div class="line"></div>
-            <div class="line"></div>
+    <nav class="cinematic-nav">
+        <div class="nav-logo">CSI YOUTH</div>
+        <div class="nav-links">
+            <a href="#" class="interactive">HOME</a>
+            <a href="#" class="interactive">VISION</a>
+            <a href="#" class="interactive">GATHER</a>
         </div>
     </nav>
 
-    <div class="nav-overlay">
-        <div class="nav-links">
-            <a href="#s02" class="nav-link" data-cursor="VIEW">FAITH</a>
-            <a href="#s05" class="nav-link" data-cursor="VIEW">COMMUNITY</a>
-            <a href="#s08" class="nav-link" data-cursor="VIEW">YOUTH NIGHTS</a>
-            <a href="#s11" class="nav-link" data-cursor="VIEW">CONNECT</a>
-        </div>
-    </div>
+    <!-- Global Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
 
-    <!-- Main Scroll Container -->
-    <main id="smooth-wrapper">
-        <div id="smooth-content">
+    <!-- Scroll Controlled Movie -->
+    <main id="scroll-container">
 
-            <!-- 01: CINEMATIC OPENING -->
-            <section id="s01" class="scene opening-scene">
-                <div class="opening-metadata">
-                    <span>SEQ. 01</span>
-                    <span>33.8688° S, 151.2093° E</span>
-                    <span>AWAKEN</span>
-                </div>
-                <div class="massive-title-container">
-                    <h1 class="split-text title-layer-back">CSI</h1>
-                    <h1 class="split-text title-layer-mid">SYDNEY</h1>
-                    <h1 class="split-text title-layer-front">YOUTH</h1>
-                </div>
-                <div class="scroll-indicator">
-                    <span class="gold-text">BEGIN</span>
-                    <div class="scroll-line"></div>
-                </div>
-            </section>
+        <!-- SCENE 01: THE VOID -->
+        <section class="scene scene-void" id="scene-void">
+            <div class="void-container">
+                <div class="void-dot"></div>
+                <div class="void-impact-ring"></div>
+                <div class="void-light-burst"></div>
+            </div>
+        </section>
 
-            <!-- 02: CHRIST / FAITH -->
-            <section id="s02" class="scene faith-scene">
-                <div class="film-frame">
-                    <img src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=2070&auto=format&fit=crop" alt="Faith Imagery" class="parallax-img">
-                    <div class="frame-overlay"></div>
-                </div>
-                <div class="faith-words">
-                    <h2 class="faith-word w-1">THE WAY</h2>
-                    <h2 class="faith-word w-2">THE TRUTH</h2>
-                    <h2 class="faith-word w-3">THE LIFE</h2>
-                </div>
-            </section>
+        <!-- SCENE 02: THE FIRST LIGHT -->
+        <section class="scene scene-first-light" id="scene-first-light">
+            <div class="layer bg-layer" style="background-image: url('https://images.unsplash.com/photo-1507281736509-c6289f1ea0f8?q=80&w=2560&auto=format&fit=crop');"></div>
+            <div class="layer atmosphere-layer"></div>
+            <div class="title-container">
+                <h1 class="cinematic-title">
+                    <span class="word">THE</span>
+                    <span class="word accent-word">BEGINNING</span>
+                </h1>
+            </div>
+        </section>
 
-            <!-- 03: ABOUT / BLUR REVEAL -->
-            <section id="s03" class="scene about-scene">
-                <div class="blur-container">
-                    <p class="editorial-text gold-text text-small">WHO WE ARE</p>
-                    <h2 class="blur-text">WE ARE A GENERATION ROOTED IN SCRIPTURE,<br>TRANSFORMED BY GRACE, AND COMMISSIONED TO<br>BRING THE HOPE OF CHRIST TO SYDNEY.</h2>
-                    <div class="about-metadata">
-                        <span>FAITH</span>
-                        <div class="dot"></div>
-                        <span>FELLOWSHIP</span>
-                        <div class="dot"></div>
-                        <span>SERVICE</span>
-                    </div>
-                </div>
-            </section>
+        <!-- SCENE 03 & 04: TYPOGRAPHY MORPH -->
+        <section class="scene scene-text-morph" id="scene-text-morph">
+            <div class="layer morph-bg" style="background-image: url('https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?q=80&w=2560&auto=format&fit=crop');"></div>
+            <div class="morph-text-container">
+                <h2 class="morph-text">LET THERE BE LIGHT</h2>
+            </div>
+        </section>
 
-            <!-- 04: IDENTITY / VALUES GALLERY -->
-            <section id="s04" class="scene identity-scene">
-                <div class="floating-words-container">
-                    <div class="float-word" data-speed="1.2">FAITH</div>
-                    <div class="float-word outline" data-speed="0.8">PURPOSE</div>
-                    <div class="float-word" data-speed="1.5">WORSHIP</div>
-                    <div class="float-word outline" data-speed="0.5">BELONG</div>
-                </div>
-            </section>
+        <!-- SCENE 05: THE HANDS (CLIMAX) -->
+        <section class="scene scene-hands" id="scene-hands">
+            <div class="hands-atmosphere"></div>
+            
+            <div class="hand-container hand-left">
+                <!-- Using a dramatic hand reaching out -->
+                <div class="hand-image" style="background-image: url('https://images.unsplash.com/photo-1614031413149-161b96a12db7?q=80&w=1200&auto=format&fit=crop'); transform: scaleX(-1);"></div>
+            </div>
+            
+            <div class="hand-container hand-right">
+                <div class="hand-image" style="background-image: url('https://images.unsplash.com/photo-1598194916694-8149eeb7fc39?q=80&w=1200&auto=format&fit=crop');"></div>
+            </div>
 
-            <!-- 05: COMMUNITY ARCHIVE -->
-            <section id="s05" class="scene community-scene">
-                <h2 class="massive-bg-text" data-speed="0.2">ONE BODY</h2>
-                <div class="photo-archive">
-                    <div class="archive-img img-1" data-speed="1.1" data-cursor="EXPLORE"><img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=2069&auto=format&fit=crop" alt="Community"></div>
-                    <div class="archive-img img-2" data-speed="0.8" data-cursor="EXPLORE"><img src="https://images.unsplash.com/photo-1529156069898-49953eb1b5ae?q=80&w=2070&auto=format&fit=crop" alt="Youth"></div>
-                    <div class="archive-img img-3" data-speed="1.3" data-cursor="EXPLORE"><img src="https://images.unsplash.com/photo-1470229722913-7c090bdc6e5f?q=80&w=2070&auto=format&fit=crop" alt="Worship"></div>
-                </div>
-            </section>
+            <div class="divine-contact-point"></div>
+            <div class="white-transition"></div>
+        </section>
 
-            <!-- 06: CALLED HERE (BENCHMARK 2) -->
-            <section id="s06" class="scene called-here-scene">
-                <div class="ch-background parallax-bg" data-speed="0.5">
-                    <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2070&auto=format&fit=crop" alt="Sydney">
-                    <div class="ch-overlay"></div>
-                </div>
-                <div class="ch-content">
-                    <h1 class="massive-title called-text" data-speed="1.2">CALLED HERE</h1>
-                    <p class="gold-text editorial-text" data-speed="1.5">FOR THIS CITY. FOR THIS TIME.</p>
-                    <p class="ch-meta" data-speed="1.8">33.8688° S, 151.2093° E</p>
-                </div>
-            </section>
+        <!-- SCENE 06: COMMUNITY -->
+        <section class="scene scene-community" id="scene-community">
+            <div class="layer bg-layer community-bg" style="background-image: url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2560&auto=format&fit=crop');"></div>
+            <div class="layer warm-overlay"></div>
+            <div class="community-text">
+                <h3 class="stagger-text">WE</h3>
+                <h3 class="stagger-text">ARE</h3>
+                <h3 class="stagger-text">GATHERED</h3>
+            </div>
+        </section>
 
-            <!-- 07: WHAT HAPPENS (CHAPTERS) -->
-            <section id="s07" class="scene chapters-scene">
-                <div class="chapter-pin">
-                    <div class="chapter-content c-worship">
-                        <div class="chap-bg"><img src="https://images.unsplash.com/photo-1438283173091-5dbf5c5a3206?q=80&w=2000&auto=format&fit=crop" alt="Worship"></div>
-                        <h2 class="chap-title">WORSHIP</h2>
-                    </div>
-                    <div class="chapter-content c-word">
-                        <div class="chap-bg"><img src="https://images.unsplash.com/photo-1455309014342-96ab550f093f?q=80&w=2000&auto=format&fit=crop" alt="Word"></div>
-                        <h2 class="chap-title">THE WORD</h2>
-                    </div>
-                    <div class="chapter-content c-community">
-                        <div class="chap-bg"><img src="https://images.unsplash.com/photo-1523580494112-02c918ee0853?q=80&w=2000&auto=format&fit=crop" alt="Community"></div>
-                        <h2 class="chap-title">COMMUNITY</h2>
-                    </div>
-                </div>
-            </section>
+        <!-- SCENE 07: SYDNEY ATMOSPHERE -->
+        <section class="scene scene-sydney" id="scene-sydney">
+            <div class="layer bg-layer sydney-bg" style="background-image: url('https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=2560&auto=format&fit=crop');"></div>
+            <div class="layer dark-gradient"></div>
+        </section>
 
-            <!-- 08: YOUTH NIGHTS (BENCHMARK 1) -->
-            <section id="s08" class="scene youth-nights-scene">
-                <div class="yn-environment"></div>
-                <div class="yn-card-container" data-cursor="VIEW">
-                    <div class="yn-card" data-tilt>
-                        <p class="gold-text editorial-text yn-meta">EVERY FRIDAY • 7:00 PM</p>
-                        <h2 class="yn-title">YOUTH NIGHTS</h2>
-                        <p class="yn-desc">Worship, Word, and authentic community in the heart of Strathfield.</p>
-                        <div class="yn-expand-details">
-                            <div class="detail-row"><span>VENUE</span> <span>STRATHFIELD CAMPUS</span></div>
-                            <div class="detail-row"><span>DOORS</span> <span>6:30 PM</span></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <!-- SCENE 08: IDENTITY REVEAL -->
+        <section class="scene scene-identity" id="scene-identity">
+            <div class="identity-wrapper">
+                <div class="id-small reveal-up">CSI</div>
+                <div class="id-large reveal-up">SYDNEY</div>
+                <div class="id-huge reveal-up">YOUTH</div>
+            </div>
+        </section>
 
-            <!-- 09: HORIZONTAL PHOTO EXPERIENCE -->
-            <section id="s09" class="scene h-scroll-scene">
-                <div class="h-scroll-container">
-                    <div class="h-track">
-                        <div class="h-item"><img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=2000&auto=format&fit=crop" alt="Moments"></div>
-                        <div class="h-item title-item"><h2>MOMENTS</h2></div>
-                        <div class="h-item"><img src="https://images.unsplash.com/photo-1526976663112-00445d0de9bf?q=80&w=2000&auto=format&fit=crop" alt="Moments"></div>
-                        <div class="h-item"><img src="https://images.unsplash.com/photo-1609357605129-26f69abb5d72?q=80&w=2000&auto=format&fit=crop" alt="Moments"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 10: INVITATION -->
-            <section id="s10" class="scene invite-scene">
-                <div class="invite-content">
-                    <h2 class="stretch-text">YOU BELONG HERE</h2>
-                    <div class="light-sweep"></div>
-                </div>
-            </section>
-
-            <!-- 11: GET INVOLVED -->
-            <section id="s11" class="scene contact-scene">
-                <div class="contact-grid">
-                    <a href="#" class="contact-link" data-cursor="DRAG">
-                        <span class="cl-title">JOIN US</span>
-                        <span class="cl-meta">NEXT EVENT</span>
-                    </a>
-                    <a href="#" class="contact-link" data-cursor="DRAG">
-                        <span class="cl-title">INSTAGRAM</span>
-                        <span class="cl-meta">@CSISYDNEYYOUTH</span>
-                    </a>
-                    <a href="#" class="contact-link" data-cursor="DRAG">
-                        <span class="cl-title">LOCATION</span>
-                        <span class="cl-meta">GET DIRECTIONS</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- 12: FINAL CTA -->
-            <section id="s12" class="scene cta-scene">
-                <div class="cta-wrapper">
-                    <h2 class="cta-sub gold-text editorial-text">STEP INTO THE STORY</h2>
-                    <a href="#" class="magnetic-btn massive-btn" data-magnetic data-cursor="CTA">
-                        <span class="btn-text">JOIN THE COMMUNITY</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- 13: FOOTER -->
-            <footer id="s13" class="scene footer-scene">
-                <div class="footer-bg-text" data-speed="0.8">AWAKEN</div>
-                <div class="footer-content">
-                    <div class="f-col">
-                        <h4>CSI SYDNEY YOUTH</h4>
-                        <p>Faith. Purpose. Community.</p>
-                    </div>
-                    <div class="f-col">
-                        <h4>CONNECT</h4>
-                        <ul>
-                            <li><a href="#">Instagram</a></li>
-                            <li><a href="#">YouTube</a></li>
-                            <li><a href="#">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div class="f-col">
-                        <h4>LOCATION</h4>
-                        <p>Strathfield, NSW<br>Australia</p>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <p>&copy; 2026 CSI Sydney Youth. All rights reserved.</p>
-                    <p class="credits">DESIGNED AS AN EXPERIENCE</p>
-                </div>
+        <!-- SCENE 09: INVITATION & OUTRO -->
+        <section class="scene scene-outro" id="scene-outro">
+            <div class="outro-content">
+                <h2 class="invitation-text">COME AS YOU ARE.</h2>
+                <a href="#" class="cinematic-btn interactive">
+                    <span class="btn-text">MEET US</span>
+                    <div class="btn-glow"></div>
+                </a>
+            </div>
+            <footer class="minimal-footer">
+                <p>GRACE • FAITH • HOPE</p>
+                <p class="copyright">© 2026 CSI SYDNEY YOUTH</p>
             </footer>
+        </section>
 
-        </div>
     </main>
 
-    <!-- Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-    
-    <!-- Main Logic -->
-    <script src="index.js"></script>
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
