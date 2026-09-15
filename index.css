@@ -29,10 +29,6 @@ html, body {
   cursor: default;
 }
 
-body.loading {
-  overflow: hidden;
-}
-
 .custom-cursor {
   position: fixed;
   top: 0;
