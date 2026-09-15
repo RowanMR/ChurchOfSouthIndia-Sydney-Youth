@@ -1,515 +1,457 @@
-/**
- * CSI SYDNEY YOUTH - Cinematic Interactive Experience
- * Awwwards Level Implementation
- */
+// index.js
+document.addEventListener('DOMContentLoaded', () => {
+  'use strict';
 
-document.addEventListener("DOMContentLoaded", () => {
-    // --- System Initialization ---
-    initLenis();
+  // --- ENGINE SETUP & STATE MANAGEMENT ---
+  const state = {
+    lenis: null,
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    isMobile: window.innerWidth <= 768,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    canvas: {
+      ambientCtx: null,
+      particleCtx: null,
+      particles: [],
+      ambientParticles: []
+    }
+  };
+
+  // --- INITIALIZATION PIPELINE ---
+  const init = () => {
+    document.body.classList.remove('loading');
+    initSmoothScroll();
     initCursor();
-    initParticles();
-    
-    // --- GSAP Timeline Orchestration ---
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Allow images and fonts to render before calculating scroll heights
-    window.addEventListener("load", () => {
-        initCinematicNav();
-        buildSceneTheVoid();
-        buildSceneFirstLight();
-        buildSceneTextMorph();
-        buildSceneHands();
-        buildSceneCommunity();
-        buildSceneSydney();
-        buildSceneIdentity();
-        buildSceneOutro();
-        
-        ScrollTrigger.refresh();
-    });
-});
+    initImageLoading();
+    initCanvasContexts();
+    initAmbientParticles();
+    initWorldThreeParticles();
+    buildCinematicTimeline();
+    bindEvents();
+  };
 
-/* ==================================================
-   1. CORE SYSTEMS
-================================================== */
+  // --- LENIS SMOOTH SCROLL INTEGRATION ---
+  const initSmoothScroll = () => {
+    if (typeof Lenis === 'undefined') return;
 
-let lenis;
-function initLenis() {
-    lenis = new Lenis({
-        duration: 1.5, // Slow, cinematic scroll
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smooth: true,
-        direction: 'vertical',
-        gestureDirection: 'vertical',
-        mouseMultiplier: 0.8,
+    state.lenis = new Lenis({
+      duration: 1.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.5,
+      infinite: false
     });
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-}
+    state.lenis.on('scroll', ScrollTrigger.update);
 
-function initCursor() {
-    const cursor = document.getElementById('cursor');
-    const cursorDot = document.querySelector('.cursor-dot');
-    const cursorRing = document.querySelector('.cursor-ring');
-    
-    // Disable on touch devices
-    if(window.matchMedia("(pointer: coarse)").matches) {
-        cursor.style.display = 'none';
-        return;
+    gsap.ticker.add((time) => {
+      state.lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
+  };
+
+  // --- CUSTOM CURSOR SYSTEM ---
+  const initCursor = () => {
+    const cursor = document.getElementById('custom-cursor');
+    const dot = cursor ? cursor.querySelector('.cursor-dot') : null;
+    const ring = cursor ? cursor.querySelector('.cursor-ring') : null;
+
+    if (!cursor || state.isMobile) {
+      if (cursor) cursor.style.display = 'none';
+      return;
     }
 
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let dotX = mouseX;
-    let dotY = mouseY;
-    let ringX = mouseX;
-    let ringY = mouseY;
+    let mouseX = -100, mouseY = -100;
+    let ringX = -100, ringY = -100;
 
     window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      gsap.set(dot, { x: mouseX, y: mouseY });
     });
 
-    function renderCursor() {
-        // Linear interpolation for smooth trailing
-        dotX += (mouseX - dotX) * 0.2;
-        dotY += (mouseY - dotY) * 0.2;
-        ringX += (mouseX - ringX) * 0.1;
-        ringY += (mouseY - ringY) * 0.1;
+    const renderCursor = () => {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      gsap.set(ring, { x: ringX, y: ringY });
+      requestAnimationFrame(renderCursor);
+    };
+    requestAnimationFrame(renderCursor);
+  };
 
-        cursorDot.style.transform = `translate(${dotX}px, ${dotY}px)`;
-        cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`;
+  // --- ROBUST IMAGE FALLBACK & LOADING SYSTEM ---
+  const initImageLoading = () => {
+    const images = document.querySelectorAll('.cinema-img');
 
-        requestAnimationFrame(renderCursor);
-    }
-    renderCursor();
-
-    // Hover interactions
-    const interactives = document.querySelectorAll('a, .interactive');
-    interactives.forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    images.forEach((img) => {
+      if (img.complete && img.naturalHeight !== 0) {
+        img.classList.add('loaded');
+      } else {
+        img.addEventListener('load', () => img.classList.add('loaded'));
+        img.addEventListener('error', () => {
+          console.warn(`Image failed to load: ${img.src}. Triggering procedural backdrop fallback.`);
+          img.style.display = 'none';
+          const parent = img.parentElement;
+          if (parent) {
+            parent.style.background = 'radial-gradient(circle at 50% 40%, #2a241b 0%, #050508 100%)';
+          }
+        });
+      }
     });
-}
+  };
 
-/* ==================================================
-   2. PARTICLE ENGINE (Canvas 2D)
-================================================== */
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let width, height;
+  // --- CANVAS & PARTICLES ENGINE ---
+  const initCanvasContexts = () => {
+    const ambientCanvas = document.getElementById('ambient-canvas');
+    const particleCanvas = document.getElementById('particle-canvas');
 
-function resizeCanvas() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-class Particle {
-    constructor(x, y, type = 'ambient') {
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        
-        if (type === 'ambient') {
-            this.vx = (Math.random() - 0.5) * 0.2;
-            this.vy = -Math.random() * 0.5;
-            this.size = Math.random() * 1.5;
-            this.life = Math.random() * 0.5 + 0.2;
-            this.color = `rgba(255, 245, 220, ${Math.random() * 0.5})`;
-        } else if (type === 'void-spark') {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 15 + 5;
-            this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
-            this.size = Math.random() * 3 + 1;
-            this.life = 1.0;
-            this.decay = Math.random() * 0.02 + 0.02;
-            this.color = 'rgba(255, 255, 255, 1)';
-        } else if (type === 'divine-spark') {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 20 + 10;
-            this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
-            this.size = Math.random() * 4 + 2;
-            this.life = 1.0;
-            this.decay = Math.random() * 0.015 + 0.01;
-            this.color = `rgba(255, 255, 255, 1)`;
-        }
+    if (ambientCanvas) {
+      ambientCanvas.width = state.windowWidth;
+      ambientCanvas.height = state.windowHeight;
+      state.canvas.ambientCtx = ambientCanvas.getContext('2d');
     }
 
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        
-        if (this.type === 'ambient') {
-            this.y -= 0.5; // continuous drift up
-            if (this.y < 0) this.y = height;
-        } else {
-            this.life -= this.decay;
-            this.vx *= 0.95; // friction
-            this.vy *= 0.95;
-        }
+    if (particleCanvas) {
+      particleCanvas.width = state.windowWidth;
+      particleCanvas.height = state.windowHeight;
+      state.canvas.particleCtx = particleCanvas.getContext('2d');
+    }
+  };
+
+  const initAmbientParticles = () => {
+    const count = state.isMobile ? 30 : 70;
+    state.canvas.ambientParticles = [];
+
+    for (let i = 0; i < count; i++) {
+      state.canvas.ambientParticles.push({
+        x: Math.random() * state.windowWidth,
+        y: Math.random() * state.windowHeight,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.5 + 0.1,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3 - 0.2
+      });
     }
 
-    draw() {
+    const renderAmbient = () => {
+      const ctx = state.canvas.ambientCtx;
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, state.windowWidth, state.windowHeight);
+
+      state.canvas.ambientParticles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = state.windowWidth;
+        if (p.x > state.windowWidth) p.x = 0;
+        if (p.y < 0) p.y = state.windowHeight;
+        if (p.y > state.windowHeight) p.y = 0;
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        
-        if (this.type === 'ambient') {
-            ctx.fillStyle = this.color;
-        } else {
-            ctx.fillStyle = `rgba(255,255,255,${this.life})`;
-        }
-        
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 245, 220, ${p.alpha})`;
         ctx.fill();
+      });
+
+      requestAnimationFrame(renderAmbient);
+    };
+
+    renderAmbient();
+  };
+
+  const initWorldThreeParticles = () => {
+    const count = state.isMobile ? 80 : 200;
+    state.canvas.particles = [];
+
+    for (let i = 0; i < count; i++) {
+      state.canvas.particles.push({
+        x: (Math.random() - 0.5) * state.windowWidth * 2,
+        y: (Math.random() - 0.5) * state.windowHeight * 2,
+        z: Math.random() * 2000,
+        radius: Math.random() * 2 + 1,
+        color: Math.random() > 0.3 ? '#ffffff' : '#d4af37'
+      });
     }
-}
+  };
 
-// Init ambient particles
-for (let i = 0; i < 50; i++) {
-    particles.push(new Particle(Math.random() * width, Math.random() * height, 'ambient'));
-}
+  const drawWorldThreeParticles = (progress) => {
+    const ctx = state.canvas.particleCtx;
+    if (!ctx) return;
 
-function animateParticles() {
-    ctx.clearRect(0, 0, width, height);
-    
-    for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update();
-        particles[i].draw();
-        
-        if (particles[i].type !== 'ambient' && particles[i].life <= 0) {
-            particles.splice(i, 1);
-        }
-    }
-    requestAnimationFrame(animateParticles);
-}
-animateParticles();
+    ctx.clearRect(0, 0, state.windowWidth, state.windowHeight);
 
-// Triggers for Canvas Effects
-function triggerVoidExplosion() {
-    const cx = width / 2;
-    const cy = height * 0.8;
-    for (let i = 0; i < 150; i++) {
-        particles.push(new Particle(cx, cy, 'void-spark'));
-    }
-}
+    const cx = state.windowWidth / 2;
+    const cy = state.windowHeight / 2;
 
-function triggerDivineExplosion() {
-    const cx = width / 2;
-    const cy = height / 2;
-    for (let i = 0; i < 300; i++) {
-        particles.push(new Particle(cx, cy, 'divine-spark'));
-    }
-}
+    state.canvas.particles.forEach((p) => {
+      let currentZ = (p.z - progress * 2500) % 2000;
+      if (currentZ < 1) currentZ += 2000;
 
+      const scale = 400 / currentZ;
+      const x2d = cx + p.x * scale;
+      const y2d = cy + p.y * scale;
 
-/* ==================================================
-   3. SCENE TIMELINES (GSAP)
-================================================== */
-
-function initCinematicNav() {
-    gsap.to('.cinematic-nav', {
-        opacity: 1,
-        duration: 2,
-        delay: 3,
-        ease: 'power2.out'
-    });
-}
-
-// SCENE 01: THE VOID
-function buildSceneTheVoid() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-void",
-            start: "top top",
-            end: "+=200%", // Pin for 2 viewport heights
-            pin: true,
-            scrub: 1,
-            onUpdate: (self) => {
-                // Trigger canvas explosion exactly at the impact point
-                if (self.progress > 0.45 && self.progress < 0.5 && !self.exploded) {
-                    triggerVoidExplosion();
-                    self.exploded = true;
-                } else if (self.progress < 0.45) {
-                    self.exploded = false;
-                }
-            }
-        }
+      if (x2d >= 0 && x2d <= state.windowWidth && y2d >= 0 && y2d <= state.windowHeight) {
+        const alpha = Math.min(1, (2000 - currentZ) / 500) * (currentZ / 2000);
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, Math.max(0.5, p.radius * scale), 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+      }
     });
 
-    tl.to('.void-dot', {
-        top: '80%',
-        ease: 'power4.in',
-        duration: 2
-    }, 0)
-    .to('.void-dot', {
-        height: '2px', // squash effect on impact
-        duration: 0.1
-    }, 2)
-    .to('.void-dot', {
-        opacity: 0,
-        duration: 0.1
-    }, 2.1)
-    .to('.void-impact-ring', {
-        opacity: 1,
-        width: '50vw',
-        height: '50vw',
-        transform: 'translate(-50%, -50%)',
-        borderWidth: '0px',
-        duration: 1.5,
-        ease: 'expo.out'
-    }, 2.1)
-    .to('.void-light-burst', {
-        opacity: 1,
-        scale: 10,
-        duration: 2,
-        ease: 'power2.inOut'
-    }, 2.1)
-    .to('.void-container', {
-        opacity: 0,
-        duration: 1
-    }, 3);
-}
+    ctx.globalAlpha = 1.0;
+  };
 
-// SCENE 02: THE FIRST LIGHT
-function buildSceneFirstLight() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-first-light",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-        }
+  // --- CORE CINEMATIC SCROLL TIMELINE (WORLD 01 -> WORLD 02 -> WORLD 03) ---
+  const buildCinematicTimeline = () => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Master Timeline Scrubbing
+    const world1 = document.getElementById('world-01');
+    const world2 = document.getElementById('world-02');
+    const world3 = document.getElementById('world-03');
+
+    // -----------------------------------------------------------------
+    // WORLD 01: THE VOID -> THE FALL -> THE IMPACT
+    // -----------------------------------------------------------------
+    const dotContainer = document.getElementById('dot-container');
+    const luminousDot = document.getElementById('luminous-dot');
+    const lightTrail = document.getElementById('dot-light-trail');
+    const shockwaves = document.querySelectorAll('.shockwave');
+    const lightBurst = document.querySelector('.light-burst');
+    const secondaryFlash = document.querySelector('.secondary-flash');
+
+    const tlWorld1 = gsap.timeline({
+      scrollTrigger: {
+        trigger: world1,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1
+      }
     });
 
-    // Parallax background
-    tl.to('.scene-first-light .bg-layer', {
-        y: '20%',
-        scale: 1,
-        ease: 'none',
-        duration: 1
-    }, 0);
-
-    // Text Reveal
-    gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-first-light",
-            start: "top center",
-            end: "+=50%",
-            scrub: 1
-        }
+    // Phase 1: Micro movement & ambient glow pulse
+    tlWorld1.to(luminousDot, {
+      scale: 1.8,
+      boxShadow: '0 0 40px 10px rgba(255, 255, 255, 1), 0 0 90px 30px rgba(212, 175, 55, 0.9)',
+      duration: 1
     })
-    .to('.cinematic-title .word', {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        filter: 'blur(0px)',
-        stagger: 0.3,
-        ease: 'power3.out'
-    });
-}
-
-// SCENE 03 & 04: TEXT MORPH
-function buildSceneTextMorph() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-text-morph",
-            start: "top top",
-            end: "+=150%",
-            pin: true,
-            scrub: 1
-        }
-    });
-
-    tl.to('.morph-text', {
-        opacity: 1,
-        duration: 1
+    // Phase 2: Acceleration & Camera Fall Illusion
+    .to(dotContainer, {
+      y: '35vh',
+      scale: 0.4,
+      duration: 2.5,
+      ease: 'power2.in'
+    }, '<')
+    .to(lightTrail, {
+      height: '180px',
+      opacity: 0.8,
+      duration: 2
+    }, '<+=0.5')
+    // Phase 3: Rapid descent & distortion before impact
+    .to(dotContainer, {
+      y: '48vh',
+      scale: 30,
+      duration: 1.2,
+      ease: 'power4.in'
     })
-    .to('.morph-bg', {
-        opacity: 0, // Background fades out, leaving only text with image inside
-        duration: 2
+    .to(lightTrail, {
+      opacity: 0,
+      duration: 0.3
+    }, '<')
+    // Phase 4: THE IMPACT
+    .to(secondaryFlash, {
+      opacity: 1,
+      duration: 0.1,
+      ease: 'power4.out'
     })
-    .to('.morph-text', {
-        scale: 50, // Massive scale through the text
-        opacity: 0,
-        duration: 3,
-        ease: 'power4.in'
-    }, "+=0.5");
-}
-
-// SCENE 05: THE HANDS (SHOWCASE)
-function buildSceneHands() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-hands",
-            start: "top top",
-            end: "+=250%",
-            pin: true,
-            scrub: 1,
-            onUpdate: (self) => {
-                if (self.progress > 0.6 && self.progress < 0.65 && !self.divineExploded) {
-                    triggerDivineExplosion();
-                    self.divineExploded = true;
-                } else if (self.progress < 0.6) {
-                    self.divineExploded = false;
-                }
-            }
-        }
-    });
-
-    // Atmosphere building
-    tl.to('.hands-atmosphere', {
-        opacity: 1,
-        duration: 2
-    }, 0);
-
-    // Hands moving toward center
-    tl.to('.hand-left', {
-        left: '2vw',
-        opacity: 1,
-        duration: 4,
-        ease: 'power2.inOut'
-    }, 0)
-    .to('.hand-right', {
-        right: '2vw',
-        opacity: 1,
-        duration: 4,
-        ease: 'power2.inOut'
-    }, 0);
-
-    // The Touch
-    tl.to('.divine-contact-point', {
-        opacity: 1,
-        scale: 1,
-        duration: 0.5,
-        ease: 'power4.out'
-    }, 3.8)
-    .to('.divine-contact-point', {
-        scale: 50,
-        opacity: 0,
-        duration: 2,
-        ease: 'power2.in'
-    }, 4.2)
-    .to('.white-transition', {
-        opacity: 1,
-        duration: 1.5
-    }, 4.5);
-}
-
-// SCENE 06: COMMUNITY (Fades in from white transition)
-function buildSceneCommunity() {
-    // Reveal community background out of the white flash
-    gsap.to('.community-bg', {
-        scrollTrigger: {
-            trigger: "#scene-community",
-            start: "top bottom",
-            end: "top top",
-            scrub: 1
-        },
-        opacity: 1,
-        filter: 'brightness(1) contrast(1)'
-    });
-
-    gsap.to('.warm-overlay', {
-        scrollTrigger: {
-            trigger: "#scene-community",
-            start: "top center",
-            end: "bottom center",
-            scrub: 1
-        },
-        opacity: 1
-    });
-
-    // Stagger text horizontally
-    gsap.to('.stagger-text', {
-        scrollTrigger: {
-            trigger: "#scene-community",
-            start: "top center",
-            end: "+=50%",
-            scrub: 1
-        },
-        x: 0,
-        opacity: 1,
-        stagger: 0.2,
-        ease: 'power2.out'
-    });
-
-    // Parallax
-    gsap.to('.community-bg', {
-        scrollTrigger: {
-            trigger: "#scene-community",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1
-        },
-        y: '15%',
-        ease: 'none'
-    });
-}
-
-// SCENE 07: SYDNEY ATMOSPHERE
-function buildSceneSydney() {
-    gsap.to('.sydney-bg', {
-        scrollTrigger: {
-            trigger: "#scene-sydney",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1
-        },
-        y: '20%',
-        scale: 1,
-        ease: 'none'
-    });
-}
-
-// SCENE 08: IDENTITY REVEAL
-function buildSceneIdentity() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-identity",
-            start: "top center",
-            end: "center center",
-            scrub: 1
-        }
-    });
-
-    tl.to('.reveal-up', {
-        y: 0,
-        opacity: 1,
-        stagger: 0.3,
-        ease: 'power3.out'
-    });
-}
-
-// SCENE 09: OUTRO
-function buildSceneOutro() {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: "#scene-outro",
-            start: "top center",
-            end: "bottom bottom",
-            scrub: 1
-        }
-    });
-
-    tl.to('.invitation-text', {
-        opacity: 1,
-        y: -20,
-        duration: 1
+    .to(lightBurst, {
+      opacity: 1,
+      duration: 0.4
+    }, '<')
+    .to(shockwaves, {
+      scale: 40,
+      opacity: 1,
+      stagger: 0.15,
+      duration: 1.5,
+      ease: 'power3.out'
+    }, '<')
+    .to(secondaryFlash, {
+      opacity: 0,
+      duration: 0.8
     })
-    .to('.cinematic-btn', {
-        opacity: 1,
-        y: -10,
-        duration: 0.5
-    }, "-=0.5")
-    .to('.minimal-footer', {
-        opacity: 0.8,
-        duration: 0.5
-    }, "-=0.2");
-}
+    // Seamless light portal transition into World 02
+    .to(lightBurst, {
+      scale: 2,
+      background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(251,249,245,1) 100%)',
+      duration: 1.5
+    });
+
+    // -----------------------------------------------------------------
+    // WORLD 02: THE LIGHT -> HEAVENLY LANDSCAPE -> CHRIST REVEAL
+    // -----------------------------------------------------------------
+    const skyImg = document.querySelector('.layer-sky');
+    const mountainImg = document.querySelector('.layer-mountains');
+    const sunSource = document.querySelector('.layer-sun-source');
+    const christContainer = document.getElementById('christ-container');
+    const artworkLightPass = document.querySelector('.artwork-light-pass');
+    const secondaryArtwork = document.querySelector('.secondary-artwork');
+
+    const tlWorld2 = gsap.timeline({
+      scrollTrigger: {
+        trigger: world2,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1
+      }
+    });
+
+    tlWorld2
+    // Beat 01: Emerging from light into atmosphere
+    .fromTo(skyImg, { scale: 1.3, opacity: 0 }, { scale: 1.0, opacity: 1, duration: 2 })
+    .fromTo(mountainImg, { y: '30%', opacity: 0 }, { y: '0%', opacity: 1, duration: 2 }, '<+=0.3')
+    .fromTo(sunSource, { scale: 0.2, opacity: 0 }, { scale: 1.2, opacity: 1, duration: 2.5 }, '<')
+
+    // Beat 02: Silhouette & Sacred Light Rays reveal
+    .fromTo(christContainer, {
+      scale: 0.6,
+      y: '20%',
+      opacity: 0,
+      filter: 'brightness(0) blur(20px)'
+    }, {
+      scale: 1.0,
+      y: '0%',
+      opacity: 1,
+      filter: 'brightness(1) blur(0px)',
+      duration: 3,
+      ease: 'power2.out'
+    })
+
+    // Beat 03: Light pass across artwork
+    .to(artworkLightPass, {
+      left: '200%',
+      duration: 1.8,
+      ease: 'power1.inOut'
+    })
+
+    // Beat 04: Artwork transformation & proximity move
+    .to(secondaryArtwork, {
+      opacity: 0.6,
+      duration: 2
+    })
+    .to(christContainer, {
+      scale: 1.4,
+      z: 300,
+      duration: 3,
+      ease: 'power1.in'
+    }, '<')
+
+    // Beat 05: Image fracturing into particles
+    .to('#christ-artwork', {
+      filter: 'contrast(2) brightness(2) blur(10px)',
+      opacity: 0,
+      duration: 1.5
+    });
+
+    // -----------------------------------------------------------------
+    // WORLD 03: PARTICLES & MASSIVE 3D TYPOGRAPHY WORLD
+    // -----------------------------------------------------------------
+    const faithChars = document.querySelectorAll('.word-faith .char');
+    const graceChars = document.querySelectorAll('.word-grace .char');
+    const lightChars = document.querySelectorAll('.word-light .char');
+    const jesusChars = document.querySelectorAll('.word-jesus .char');
+
+    const tlWorld3 = gsap.timeline({
+      scrollTrigger: {
+        trigger: world3,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          drawWorldThreeParticles(self.progress);
+        }
+      }
+    });
+
+    // WORD 1: FAITH (Travel Through)
+    tlWorld3
+    .fromTo('.word-faith', { z: -1500, opacity: 0 }, { z: 200, opacity: 1, duration: 3 })
+    .to(faithChars, {
+      rotateY: (i) => (i - 2) * 15,
+      rotateX: 10,
+      stagger: 0.05,
+      duration: 2
+    }, '<')
+    .to('.word-faith', {
+      z: 1200,
+      opacity: 0,
+      duration: 2,
+      ease: 'power2.in'
+    })
+
+    // WORD 2: GRACE
+    .fromTo('.word-grace', { z: -1800, opacity: 0 }, { z: 100, opacity: 1, duration: 3 }, '<+=0.5')
+    .to(graceChars, {
+      scale: 1.2,
+      color: '#ffffff',
+      stagger: 0.08,
+      duration: 2
+    }, '<')
+    .to('.word-grace', {
+      z: 1400,
+      opacity: 0,
+      duration: 2
+    })
+
+    // WORD 3: LIGHT
+    .fromTo('.word-light', { z: -2000, opacity: 0 }, { z: 0, opacity: 1, duration: 3 }, '<+=0.5')
+    .to(lightChars, {
+      textShadow: '0 0 120px rgba(255, 255, 255, 1)',
+      stagger: 0.05,
+      duration: 2
+    }, '<')
+    .to('.word-light', {
+      z: 1500,
+      opacity: 0,
+      duration: 2
+    })
+
+    // CLIMAX WORD: JESUS
+    .fromTo('.word-jesus', { z: -2500, scale: 0.2, opacity: 0 }, { z: 0, scale: 1.0, opacity: 1, duration: 4, ease: 'power3.out' }, '<+=0.5')
+    .to(jesusChars, {
+      stagger: 0.1,
+      keyframes: [
+        { textShadow: '0 0 40px rgba(212,175,55,1)', duration: 1 },
+        { textShadow: '0 0 120px rgba(255,255,255,1)', duration: 1 }
+      ]
+    }, '<');
+  };
+
+  // --- RESIZE & EVENT BINDING ---
+  const bindEvents = () => {
+    window.addEventListener('resize', () => {
+      state.windowWidth = window.innerWidth;
+      state.windowHeight = window.innerHeight;
+      state.isMobile = window.innerWidth <= 768;
+
+      initCanvasContexts();
+      ScrollTrigger.refresh();
+    });
+  };
+
+  // EXECUTE ENGINE
+  init();
+});
