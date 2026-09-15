@@ -2,13 +2,18 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  // --- ENGINE SETUP & STATE MANAGEMENT ---
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    console.error('GSAP or ScrollTrigger script not loaded properly.');
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
   const state = {
     lenis: null,
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
     isMobile: window.innerWidth <= 768,
-    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     canvas: {
       ambientCtx: null,
       particleCtx: null,
@@ -17,9 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // --- INITIALIZATION PIPELINE ---
   const init = () => {
-    document.body.classList.remove('loading');
     initSmoothScroll();
     initCursor();
     initImageLoading();
@@ -28,33 +31,37 @@ document.addEventListener('DOMContentLoaded', () => {
     initWorldThreeParticles();
     buildCinematicTimeline();
     bindEvents();
+    
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
   };
 
-  // --- LENIS SMOOTH SCROLL INTEGRATION ---
   const initSmoothScroll = () => {
     if (typeof Lenis === 'undefined') return;
 
-    state.lenis = new Lenis({
-      duration: 1.4,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 0.95,
-      touchMultiplier: 1.5,
-      infinite: false
-    });
+    try {
+      state.lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1.0,
+        touchMultiplier: 1.5
+      });
 
-    state.lenis.on('scroll', ScrollTrigger.update);
+      state.lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
-      state.lenis.raf(time * 1000);
-    });
+      gsap.ticker.add((time) => {
+        if (state.lenis) state.lenis.raf(time * 1000);
+      });
 
-    gsap.ticker.lagSmoothing(0);
+      gsap.ticker.lagSmoothing(0);
+    } catch (e) {
+      console.warn('Lenis smooth scroll failed to initialize, falling back to browser scroll.', e);
+    }
   };
 
-  // --- CUSTOM CURSOR SYSTEM ---
   const initCursor = () => {
     const cursor = document.getElementById('custom-cursor');
     const dot = cursor ? cursor.querySelector('.cursor-dot') : null;
@@ -83,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(renderCursor);
   };
 
-  // --- ROBUST IMAGE FALLBACK & LOADING SYSTEM ---
   const initImageLoading = () => {
     const images = document.querySelectorAll('.cinema-img');
 
@@ -93,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         img.addEventListener('load', () => img.classList.add('loaded'));
         img.addEventListener('error', () => {
-          console.warn(`Image failed to load: ${img.src}. Triggering procedural backdrop fallback.`);
           img.style.display = 'none';
           const parent = img.parentElement;
           if (parent) {
@@ -104,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // --- CANVAS & PARTICLES ENGINE ---
   const initCanvasContexts = () => {
     const ambientCanvas = document.getElementById('ambient-canvas');
     const particleCanvas = document.getElementById('particle-canvas');
@@ -209,18 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.globalAlpha = 1.0;
   };
 
-  // --- CORE CINEMATIC SCROLL TIMELINE (WORLD 01 -> WORLD 02 -> WORLD 03) ---
   const buildCinematicTimeline = () => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Master Timeline Scrubbing
     const world1 = document.getElementById('world-01');
     const world2 = document.getElementById('world-02');
     const world3 = document.getElementById('world-03');
 
-    // -----------------------------------------------------------------
-    // WORLD 01: THE VOID -> THE FALL -> THE IMPACT
-    // -----------------------------------------------------------------
+    // WORLD 01 TIMELINE
     const dotContainer = document.getElementById('dot-container');
     const luminousDot = document.getElementById('luminous-dot');
     const lightTrail = document.getElementById('dot-light-trail');
@@ -239,66 +237,60 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Phase 1: Micro movement & ambient glow pulse
-    tlWorld1.to(luminousDot, {
-      scale: 1.8,
-      boxShadow: '0 0 40px 10px rgba(255, 255, 255, 1), 0 0 90px 30px rgba(212, 175, 55, 0.9)',
-      duration: 1
-    })
-    // Phase 2: Acceleration & Camera Fall Illusion
-    .to(dotContainer, {
-      y: '35vh',
-      scale: 0.4,
-      duration: 2.5,
-      ease: 'power2.in'
-    }, '<')
-    .to(lightTrail, {
-      height: '180px',
-      opacity: 0.8,
-      duration: 2
-    }, '<+=0.5')
-    // Phase 3: Rapid descent & distortion before impact
-    .to(dotContainer, {
-      y: '48vh',
-      scale: 30,
-      duration: 1.2,
-      ease: 'power4.in'
-    })
-    .to(lightTrail, {
-      opacity: 0,
-      duration: 0.3
-    }, '<')
-    // Phase 4: THE IMPACT
-    .to(secondaryFlash, {
-      opacity: 1,
-      duration: 0.1,
-      ease: 'power4.out'
-    })
-    .to(lightBurst, {
-      opacity: 1,
-      duration: 0.4
-    }, '<')
-    .to(shockwaves, {
-      scale: 40,
-      opacity: 1,
-      stagger: 0.15,
-      duration: 1.5,
-      ease: 'power3.out'
-    }, '<')
-    .to(secondaryFlash, {
-      opacity: 0,
-      duration: 0.8
-    })
-    // Seamless light portal transition into World 02
-    .to(lightBurst, {
-      scale: 2,
-      background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(251,249,245,1) 100%)',
-      duration: 1.5
-    });
+    tlWorld1
+      .to(luminousDot, {
+        scale: 1.8,
+        boxShadow: '0 0 40px 10px rgba(255, 255, 255, 1), 0 0 90px 30px rgba(212, 175, 55, 0.9)',
+        duration: 1
+      })
+      .to(dotContainer, {
+        y: '35vh',
+        scale: 0.4,
+        duration: 2.5,
+        ease: 'power2.in'
+      }, '<')
+      .to(lightTrail, {
+        height: '180px',
+        opacity: 0.8,
+        duration: 2
+      }, '<+=0.5')
+      .to(dotContainer, {
+        y: '48vh',
+        scale: 30,
+        duration: 1.2,
+        ease: 'power4.in'
+      })
+      .to(lightTrail, {
+        opacity: 0,
+        duration: 0.3
+      }, '<')
+      .to(secondaryFlash, {
+        opacity: 1,
+        duration: 0.1,
+        ease: 'power4.out'
+      })
+      .to(lightBurst, {
+        opacity: 1,
+        duration: 0.4
+      }, '<')
+      .to(shockwaves, {
+        scale: 40,
+        opacity: 1,
+        stagger: 0.15,
+        duration: 1.5,
+        ease: 'power3.out'
+      }, '<')
+      .to(secondaryFlash, {
+        opacity: 0,
+        duration: 0.8
+      })
+      .to(lightBurst, {
+        scale: 2,
+        background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(251,249,245,1) 100%)',
+        duration: 1.5
+      });
 
-    // -----------------------------------------------------------------
-    // WORLD 02: THE LIGHT -> HEAVENLY LANDSCAPE -> CHRIST REVEAL
-    // -----------------------------------------------------------------
+    // WORLD 02 TIMELINE
     const skyImg = document.querySelector('.layer-sky');
     const mountainImg = document.querySelector('.layer-mountains');
     const sunSource = document.querySelector('.layer-sun-source');
@@ -318,55 +310,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tlWorld2
-    // Beat 01: Emerging from light into atmosphere
-    .fromTo(skyImg, { scale: 1.3, opacity: 0 }, { scale: 1.0, opacity: 1, duration: 2 })
-    .fromTo(mountainImg, { y: '30%', opacity: 0 }, { y: '0%', opacity: 1, duration: 2 }, '<+=0.3')
-    .fromTo(sunSource, { scale: 0.2, opacity: 0 }, { scale: 1.2, opacity: 1, duration: 2.5 }, '<')
+      .fromTo(skyImg, { scale: 1.3, opacity: 0 }, { scale: 1.0, opacity: 1, duration: 2 })
+      .fromTo(mountainImg, { y: '30%', opacity: 0 }, { y: '0%', opacity: 1, duration: 2 }, '<+=0.3')
+      .fromTo(sunSource, { scale: 0.2, opacity: 0 }, { scale: 1.2, opacity: 1, duration: 2.5 }, '<')
+      .fromTo(christContainer, {
+        scale: 0.6,
+        y: '20%',
+        opacity: 0,
+        filter: 'brightness(0) blur(20px)'
+      }, {
+        scale: 1.0,
+        y: '0%',
+        opacity: 1,
+        filter: 'brightness(1) blur(0px)',
+        duration: 3,
+        ease: 'power2.out'
+      })
+      .to(artworkLightPass, {
+        left: '200%',
+        duration: 1.8,
+        ease: 'power1.inOut'
+      })
+      .to(secondaryArtwork, {
+        opacity: 0.6,
+        duration: 2
+      })
+      .to(christContainer, {
+        scale: 1.4,
+        z: 300,
+        duration: 3,
+        ease: 'power1.in'
+      }, '<')
+      .to('#christ-artwork', {
+        filter: 'contrast(2) brightness(2) blur(10px)',
+        opacity: 0,
+        duration: 1.5
+      });
 
-    // Beat 02: Silhouette & Sacred Light Rays reveal
-    .fromTo(christContainer, {
-      scale: 0.6,
-      y: '20%',
-      opacity: 0,
-      filter: 'brightness(0) blur(20px)'
-    }, {
-      scale: 1.0,
-      y: '0%',
-      opacity: 1,
-      filter: 'brightness(1) blur(0px)',
-      duration: 3,
-      ease: 'power2.out'
-    })
-
-    // Beat 03: Light pass across artwork
-    .to(artworkLightPass, {
-      left: '200%',
-      duration: 1.8,
-      ease: 'power1.inOut'
-    })
-
-    // Beat 04: Artwork transformation & proximity move
-    .to(secondaryArtwork, {
-      opacity: 0.6,
-      duration: 2
-    })
-    .to(christContainer, {
-      scale: 1.4,
-      z: 300,
-      duration: 3,
-      ease: 'power1.in'
-    }, '<')
-
-    // Beat 05: Image fracturing into particles
-    .to('#christ-artwork', {
-      filter: 'contrast(2) brightness(2) blur(10px)',
-      opacity: 0,
-      duration: 1.5
-    });
-
-    // -----------------------------------------------------------------
-    // WORLD 03: PARTICLES & MASSIVE 3D TYPOGRAPHY WORLD
-    // -----------------------------------------------------------------
+    // WORLD 03 TIMELINE
     const faithChars = document.querySelectorAll('.word-faith .char');
     const graceChars = document.querySelectorAll('.word-grace .char');
     const lightChars = document.querySelectorAll('.word-light .char');
@@ -386,61 +367,53 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // WORD 1: FAITH (Travel Through)
     tlWorld3
-    .fromTo('.word-faith', { z: -1500, opacity: 0 }, { z: 200, opacity: 1, duration: 3 })
-    .to(faithChars, {
-      rotateY: (i) => (i - 2) * 15,
-      rotateX: 10,
-      stagger: 0.05,
-      duration: 2
-    }, '<')
-    .to('.word-faith', {
-      z: 1200,
-      opacity: 0,
-      duration: 2,
-      ease: 'power2.in'
-    })
-
-    // WORD 2: GRACE
-    .fromTo('.word-grace', { z: -1800, opacity: 0 }, { z: 100, opacity: 1, duration: 3 }, '<+=0.5')
-    .to(graceChars, {
-      scale: 1.2,
-      color: '#ffffff',
-      stagger: 0.08,
-      duration: 2
-    }, '<')
-    .to('.word-grace', {
-      z: 1400,
-      opacity: 0,
-      duration: 2
-    })
-
-    // WORD 3: LIGHT
-    .fromTo('.word-light', { z: -2000, opacity: 0 }, { z: 0, opacity: 1, duration: 3 }, '<+=0.5')
-    .to(lightChars, {
-      textShadow: '0 0 120px rgba(255, 255, 255, 1)',
-      stagger: 0.05,
-      duration: 2
-    }, '<')
-    .to('.word-light', {
-      z: 1500,
-      opacity: 0,
-      duration: 2
-    })
-
-    // CLIMAX WORD: JESUS
-    .fromTo('.word-jesus', { z: -2500, scale: 0.2, opacity: 0 }, { z: 0, scale: 1.0, opacity: 1, duration: 4, ease: 'power3.out' }, '<+=0.5')
-    .to(jesusChars, {
-      stagger: 0.1,
-      keyframes: [
-        { textShadow: '0 0 40px rgba(212,175,55,1)', duration: 1 },
-        { textShadow: '0 0 120px rgba(255,255,255,1)', duration: 1 }
-      ]
-    }, '<');
+      .fromTo('.word-faith', { z: -1500, opacity: 0 }, { z: 200, opacity: 1, duration: 3 })
+      .to(faithChars, {
+        rotateY: (i) => (i - 2) * 15,
+        rotateX: 10,
+        stagger: 0.05,
+        duration: 2
+      }, '<')
+      .to('.word-faith', {
+        z: 1200,
+        opacity: 0,
+        duration: 2,
+        ease: 'power2.in'
+      })
+      .fromTo('.word-grace', { z: -1800, opacity: 0 }, { z: 100, opacity: 1, duration: 3 }, '<+=0.5')
+      .to(graceChars, {
+        scale: 1.2,
+        color: '#ffffff',
+        stagger: 0.08,
+        duration: 2
+      }, '<')
+      .to('.word-grace', {
+        z: 1400,
+        opacity: 0,
+        duration: 2
+      })
+      .fromTo('.word-light', { z: -2000, opacity: 0 }, { z: 0, opacity: 1, duration: 3 }, '<+=0.5')
+      .to(lightChars, {
+        textShadow: '0 0 120px rgba(255, 255, 255, 1)',
+        stagger: 0.05,
+        duration: 2
+      }, '<')
+      .to('.word-light', {
+        z: 1500,
+        opacity: 0,
+        duration: 2
+      })
+      .fromTo('.word-jesus', { z: -2500, scale: 0.2, opacity: 0 }, { z: 0, scale: 1.0, opacity: 1, duration: 4, ease: 'power3.out' }, '<+=0.5')
+      .to(jesusChars, {
+        stagger: 0.1,
+        keyframes: [
+          { textShadow: '0 0 40px rgba(212,175,55,1)', duration: 1 },
+          { textShadow: '0 0 120px rgba(255,255,255,1)', duration: 1 }
+        ]
+      }, '<');
   };
 
-  // --- RESIZE & EVENT BINDING ---
   const bindEvents = () => {
     window.addEventListener('resize', () => {
       state.windowWidth = window.innerWidth;
@@ -452,6 +425,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // EXECUTE ENGINE
   init();
 });
