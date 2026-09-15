@@ -2,273 +2,1092 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b0b0c">
-  <meta name="description" content="CSI Sydney Youth — a youth community connected to CSI Church Sydney in Blacktown, NSW.">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b0b0c"
+  >
+
+  <meta
+    name="description"
+    content="CSI Sydney Youth — a youth community connected to CSI Church Sydney in Blacktown, NSW."
+  >
+
   <title>CSI Sydney Youth — Faith. Community. Purpose.</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
+  <div class="scroll-progress" aria-hidden="true">
+    <span class="scroll-progress-bar" id="scroll-progress"></span>
+  </div>
+
   <div class="site-shell" id="site-shell">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
     <header class="site-header" id="site-header">
-      <a class="brand" href="#top" aria-label="CSI Sydney Youth home">
-        <span class="brand-mark" aria-hidden="true">+</span>
+      <a
+        class="brand magnetic"
+        href="#top"
+        aria-label="CSI Sydney Youth home"
+        data-magnetic="0.12"
+      >
+        <span class="brand-mark" aria-hidden="true">
+          <span>+</span>
+        </span>
+
         <span class="brand-copy">
           <span class="brand-name">CSI SYDNEY</span>
           <span class="brand-sub">YOUTH</span>
         </span>
       </a>
 
-      <nav class="desktop-nav" aria-label="Primary navigation">
-        <a class="nav-link is-active" href="#top">Home</a>
-        <a class="nav-link" href="#community">About</a>
-        <a class="nav-link" href="#youth-connect">Youth Connect</a>
-        <a class="nav-link" href="#story">Community</a>
-        <a class="nav-link" href="#social">Gallery</a>
+      <nav
+        class="desktop-nav"
+        aria-label="Primary navigation"
+      >
+        <a class="nav-link is-active" href="#top">
+          Home
+        </a>
+
+        <a class="nav-link" href="#community">
+          About
+        </a>
+
+        <a class="nav-link" href="#youth-connect">
+          Youth Connect
+        </a>
+
+        <a class="nav-link" href="#story">
+          Community
+        </a>
+
+        <a class="nav-link" href="#social">
+          Gallery
+        </a>
       </nav>
 
       <div class="header-actions">
-        <a class="header-contact magnetic" href="mailto:committee@csichurchsydney.org">Connect <span aria-hidden="true">↗</span></a>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
-          <span></span><span></span>
+        <a
+          class="header-contact magnetic"
+          href="mailto:committee@csichurchsydney.org"
+          data-magnetic="0.08"
+        >
+          <span>Connect</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="Open menu"
+        >
+          <span></span>
+          <span></span>
         </button>
       </div>
     </header>
 
-    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <!-- =====================================================
+         MOBILE MENU
+    ====================================================== -->
+
+    <div
+      class="mobile-menu"
+      id="mobile-menu"
+      aria-hidden="true"
+      inert
+    >
+      <div class="mobile-menu-backdrop"></div>
+
       <div class="mobile-menu-inner">
-        <p class="eyebrow">CSI SYDNEY YOUTH / MENU</p>
-        <nav aria-label="Mobile navigation">
-          <a href="#top">Home</a>
-          <a href="#community">About</a>
-          <a href="#youth-connect">Youth Connect</a>
-          <a href="#story">Community</a>
-          <a href="#social">Gallery</a>
+        <div class="mobile-menu-top">
+          <p class="eyebrow eyebrow-light">
+            CSI SYDNEY YOUTH / MENU
+          </p>
+
+          <span class="mobile-menu-number">
+            01—05
+          </span>
+        </div>
+
+        <nav
+          class="mobile-menu-nav"
+          aria-label="Mobile navigation"
+        >
+          <a href="#top">
+            <span>01</span>
+            <strong>Home</strong>
+          </a>
+
+          <a href="#community">
+            <span>02</span>
+            <strong>About</strong>
+          </a>
+
+          <a href="#youth-connect">
+            <span>03</span>
+            <strong>Youth Connect</strong>
+          </a>
+
+          <a href="#story">
+            <span>04</span>
+            <strong>Community</strong>
+          </a>
+
+          <a href="#social">
+            <span>05</span>
+            <strong>Gallery</strong>
+          </a>
         </nav>
-        <a class="button button-light" href="mailto:committee@csichurchsydney.org">Contact the church <span>↗</span></a>
+
+        <div class="mobile-menu-bottom">
+          <a
+            class="button button-light magnetic"
+            href="mailto:committee@csichurchsydney.org"
+            data-magnetic="0.1"
+          >
+            <span>Contact the church</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+
+          <p>
+            THAT THEY ALL MAY BE ONE
+          </p>
+        </div>
       </div>
     </div>
 
     <main id="main">
-      <section class="hero section-dark" id="top" aria-labelledby="hero-title">
-        <div class="hero-media media-frame" data-parallax="0.10">
-          <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=2200&q=88" alt="Friends standing together outdoors at dusk" fetchpriority="high" decoding="async">
+
+      <!-- ===================================================
+           HERO
+      ==================================================== -->
+
+      <section
+        class="hero section-dark"
+        id="top"
+        aria-labelledby="hero-title"
+      >
+        <div
+          class="hero-media media-frame"
+          data-parallax="0.08"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=2200&q=88"
+            alt="Friends standing together outdoors at dusk"
+            fetchpriority="high"
+            decoding="async"
+          >
+
           <div class="image-fallback" aria-hidden="true"></div>
         </div>
+
         <div class="hero-overlay"></div>
-        <div class="hero-gridlines" aria-hidden="true"></div>
-        <div class="hero-glow" aria-hidden="true"></div>
+
+        <div
+          class="hero-spotlight"
+          id="hero-spotlight"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="hero-gridlines"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="hero-glow"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="hero-noise"
+          aria-hidden="true"
+        ></div>
 
         <div class="hero-content page-width">
+
           <div class="hero-kicker reveal-up">
-            <span class="dot"></span>
-            CSI CHURCH SYDNEY / BLACKTOWN, NSW
+            <span class="status-dot"></span>
+
+            <span>
+              CSI CHURCH SYDNEY / BLACKTOWN, NSW
+            </span>
+
+            <span class="hero-kicker-line"></span>
+
+            <span class="hero-kicker-live">
+              COMMUNITY
+            </span>
           </div>
 
           <div class="hero-lockup">
-            <p class="hero-side-label reveal-up">A YOUTH COMMUNITY<br>ROOTED IN CHRIST</p>
-            <h1 id="hero-title" class="hero-title">
-              <span class="hero-title-line reveal-up">CSI</span>
-              <span class="hero-title-line reveal-up delay-1">SYDNEY <em>YOUTH</em></span>
+
+            <p class="hero-side-label reveal-up">
+              A YOUTH COMMUNITY
+              <br>
+              ROOTED IN CHRIST
+            </p>
+
+            <h1
+              id="hero-title"
+              class="hero-title"
+            >
+              <span class="hero-title-line reveal-up">
+                CSI
+              </span>
+
+              <span class="hero-title-line reveal-up delay-1">
+                SYDNEY
+                <em>YOUTH</em>
+              </span>
             </h1>
           </div>
 
           <div class="hero-bottom reveal-up delay-2">
-            <p>Faith in the middle of real life.<br>Friendship that makes room for you.</p>
-            <a href="#youth-connect" class="scroll-cue" aria-label="Scroll to Youth Connect">
-              <span>SCROLL TO EXPLORE</span><span class="cue-arrow">↓</span>
+
+            <div class="hero-bottom-copy">
+              <span class="hero-bottom-index">
+                01 / 09
+              </span>
+
+              <p>
+                Faith in the middle of real life.
+                <br>
+                Friendship that makes room for you.
+              </p>
+            </div>
+
+            <a
+              href="#community"
+              class="scroll-cue"
+              aria-label="Scroll to explore the homepage"
+            >
+              <span>SCROLL TO EXPLORE</span>
+
+              <span
+                class="cue-arrow"
+                aria-hidden="true"
+              >
+                ↓
+              </span>
             </a>
           </div>
         </div>
-        <div class="hero-index" aria-hidden="true">01 — 09</div>
+
+        <div class="hero-corner hero-corner-top">
+          SYD / WEST
+        </div>
+
+        <div class="hero-corner hero-corner-bottom">
+          BLACKTOWN / NSW
+        </div>
       </section>
 
-      <section class="statement section-cream" id="community" aria-labelledby="community-title">
+      <!-- ===================================================
+           WHO WE ARE
+      ==================================================== -->
+
+      <section
+        class="statement section-cream section-surface"
+        id="community"
+        aria-labelledby="community-title"
+      >
+        <div class="ambient-orb ambient-orb-light" aria-hidden="true"></div>
+
         <div class="page-width statement-grid">
+
           <div class="statement-meta reveal-up">
-            <p class="eyebrow">01 / WHO WE ARE</p>
-            <p class="meta-copy">PART OF CSI CHURCH SYDNEY<br>175 WALTERS ROAD / BLACKTOWN</p>
+            <p class="eyebrow">
+              01 / WHO WE ARE
+            </p>
+
+            <p class="meta-copy">
+              PART OF CSI CHURCH SYDNEY
+              <br>
+              175 WALTERS ROAD / BLACKTOWN
+            </p>
+
+            <div class="meta-scroll-line">
+              <span></span>
+              <small>ESTABLISHED COMMUNITY</small>
+            </div>
           </div>
+
           <div class="statement-copy">
-            <h2 id="community-title" class="display-heading reveal-up">Not just a service.<br><span>A place to belong.</span></h2>
-            <p class="lead reveal-up delay-1">CSI Sydney Youth is part of CSI Church Sydney, a congregation shaped by faith, fellowship and the wider story of the Church of South India. The youth ministry creates space for young people to worship, build friendships, talk honestly about faith and step into leadership.</p>
-            <div class="statement-line reveal-up delay-2"><span></span><span>“THAT THEY ALL MAY BE ONE”</span></div>
+
+            <div class="section-index-floating">
+              <span>01</span>
+              <span>IDENTITY</span>
+            </div>
+
+            <h2
+              id="community-title"
+              class="display-heading reveal-up"
+            >
+              Not just a service.
+              <br>
+              <span>A place to belong.</span>
+            </h2>
+
+            <p class="lead reveal-up delay-1">
+              CSI Sydney Youth is part of CSI Church Sydney,
+              a congregation shaped by faith, fellowship and
+              the wider story of the Church of South India.
+              The youth ministry creates space for young people
+              to worship, build friendships, talk honestly about
+              faith and step into leadership.
+            </p>
+
+            <div class="statement-footer reveal-up delay-2">
+
+              <div class="statement-line">
+                <span></span>
+
+                <span>
+                  “THAT THEY ALL MAY BE ONE”
+                </span>
+              </div>
+
+              <span class="statement-number">
+                01
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="youth-connect section-dark" id="youth-connect" aria-labelledby="connect-title">
+      <!-- ===================================================
+           YOUTH CONNECT
+      ==================================================== -->
+
+      <section
+        class="youth-connect section-dark"
+        id="youth-connect"
+        aria-labelledby="connect-title"
+      >
         <div class="connect-noise" aria-hidden="true"></div>
+
+        <div
+          class="connect-spotlight"
+          id="connect-spotlight"
+          aria-hidden="true"
+        ></div>
+
+        <div class="connect-scanline" aria-hidden="true"></div>
+
         <div class="page-width connect-layout">
+
           <div class="connect-intro">
-            <p class="eyebrow eyebrow-light reveal-up">02 / THE MOMENT</p>
-            <p class="intro-label reveal-up delay-1">MONTHLY / THIRD SUNDAY</p>
+            <p class="eyebrow eyebrow-light reveal-up">
+              02 / THE MOMENT
+            </p>
+
+            <p class="intro-label reveal-up delay-1">
+              MONTHLY / THIRD SUNDAY
+            </p>
+
+            <div class="connect-intro-marker reveal-up delay-2">
+              <span></span>
+              <small>
+                SAVE THE DATE
+              </small>
+            </div>
           </div>
 
           <div class="connect-main">
-            <div class="date-stack reveal-up">
-              <span class="date-word">THIRD</span>
-              <span class="date-word serif">SUNDAY</span>
+
+            <div
+              class="date-stack reveal-up"
+              aria-hidden="true"
+            >
+              <span class="date-word">
+                THIRD
+              </span>
+
+              <span class="date-word serif">
+                SUNDAY
+              </span>
+
               <span class="date-rule"></span>
-              <span class="date-sub">EVERY MONTH</span>
+
+              <span class="date-sub">
+                EVERY MONTH
+              </span>
+            </div>
+
+            <div class="connect-orbit" aria-hidden="true">
+              <span class="orbit-dot orbit-dot-one"></span>
+              <span class="orbit-dot orbit-dot-two"></span>
             </div>
 
             <div class="connect-title-wrap">
-              <h2 id="connect-title" class="connect-title reveal-up delay-1">YOUTH<br><em>CONNECT</em></h2>
-              <p class="connect-desc reveal-up delay-2">The official CSI Sydney site identifies the third Sunday English communion service as dedicated to youth. It is a regular place for young people to worship together, serve, lead and connect.</p>
+
+              <div class="connect-title-kicker reveal-up">
+                <span>REGULAR YOUTH GATHERING</span>
+                <span></span>
+              </div>
+
+              <h2
+                id="connect-title"
+                class="connect-title reveal-up delay-1"
+              >
+                YOUTH
+                <br>
+                <em>CONNECT</em>
+              </h2>
+
+              <p class="connect-desc reveal-up delay-2">
+                The official CSI Sydney site identifies the
+                third Sunday English communion service as
+                dedicated to youth. It is a regular place for
+                young people to worship together, serve, lead
+                and connect.
+              </p>
+
               <div class="connect-actions reveal-up delay-3">
-                <a class="button button-accent magnetic" href="mailto:committee@csichurchsydney.org?subject=CSI%20Sydney%20Youth%20Connect">Ask about Youth Connect <span>↗</span></a>
-                <a class="text-link" href="https://www.csichurchsydney.org/about-us" target="_blank" rel="noopener">See official church info <span>↗</span></a>
+
+                <a
+                  class="button button-accent magnetic button-glow"
+                  href="mailto:committee@csichurchsydney.org?subject=CSI%20Sydney%20Youth%20Connect"
+                  data-magnetic="0.12"
+                >
+                  <span>
+                    Ask about Youth Connect
+                  </span>
+
+                  <span aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+
+                <a
+                  class="text-link"
+                  href="https://www.csichurchsydney.org/about-us"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>
+                    See official church info
+                  </span>
+
+                  <span aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
               </div>
             </div>
 
-            <div class="next-event" aria-live="polite">
-              <span class="next-event-label">NEXT THIRD SUNDAY</span>
-              <strong id="next-third-sunday">—</strong>
-              <span class="next-event-note">Check with the church for any changes.</span>
+            <div
+              class="next-event reveal-up delay-3"
+              aria-live="polite"
+            >
+              <span class="next-event-label">
+                NEXT THIRD SUNDAY
+              </span>
+
+              <strong id="next-third-sunday">
+                —
+              </strong>
+
+              <span class="next-event-note">
+                Check with the church for any changes.
+              </span>
             </div>
           </div>
         </div>
-        <div class="connect-orbit" aria-hidden="true"><span></span></div>
+
+        <div class="section-corner section-corner-left">
+          YOUTH / 02
+        </div>
+
+        <div class="section-corner section-corner-right">
+          CONNECT
+        </div>
       </section>
 
-      <section class="story section-cream" id="story" aria-labelledby="story-title">
+      <!-- ===================================================
+           STORY / COMMUNITY
+      ==================================================== -->
+
+      <section
+        class="story section-cream section-surface"
+        id="story"
+        aria-labelledby="story-title"
+      >
         <div class="page-width story-top">
+
           <div>
-            <p class="eyebrow reveal-up">03 / FAITH + COMMUNITY</p>
-            <h2 id="story-title" class="display-heading wide reveal-up delay-1">Faith that leaves<br><span>room for real life.</span></h2>
+            <p class="eyebrow reveal-up">
+              03 / FAITH + COMMUNITY
+            </p>
+
+            <h2
+              id="story-title"
+              class="display-heading wide reveal-up delay-1"
+            >
+              Faith that leaves
+              <br>
+              <span>room for real life.</span>
+            </h2>
           </div>
-          <p class="story-intro reveal-up delay-2">The youth fellowship describes itself as a warm, welcoming and safe environment for open discussion and dialogue. Young people are encouraged to take leadership in the life of the church, including readings, hymns, music and other parts of the monthly English service.</p>
+
+          <p class="story-intro reveal-up delay-2">
+            The youth fellowship describes itself as a warm,
+            welcoming and safe environment for open discussion
+            and dialogue. Young people are encouraged to take
+            leadership in the life of the church, including
+            readings, hymns, music and other parts of the
+            monthly English service.
+          </p>
         </div>
 
         <div class="story-stage page-width">
-          <div class="story-photo photo-a reveal-scale" data-parallax="-0.07">
-            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1500&q=84" alt="Friends sharing a relaxed moment together" loading="lazy" decoding="async">
-            <div class="image-fallback" aria-hidden="true"></div>
+
+          <div
+            class="story-photo photo-a reveal-scale spotlight-card"
+            data-parallax="-0.055"
+          >
+            <span class="card-glow"></span>
+
+            <img
+              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1500&q=84"
+              alt="Friends sharing a relaxed moment together"
+              loading="lazy"
+              decoding="async"
+            >
+
+            <div
+              class="image-fallback"
+              aria-hidden="true"
+            ></div>
+
+            <div class="image-overlay-copy">
+              <span>COMMUNITY</span>
+              <span>01</span>
+            </div>
           </div>
-          <div class="story-photo photo-b reveal-scale" data-parallax="0.05">
-            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1500&q=84" alt="Crowd gathered in a live music setting" loading="lazy" decoding="async">
-            <div class="image-fallback" aria-hidden="true"></div>
+
+          <div
+            class="story-photo photo-b reveal-scale delay-1 spotlight-card"
+            data-parallax="0.035"
+          >
+            <span class="card-glow"></span>
+
+            <img
+              src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1500&q=84"
+              alt="Crowd gathered in a live music setting"
+              loading="lazy"
+              decoding="async"
+            >
+
+            <div
+              class="image-fallback"
+              aria-hidden="true"
+            ></div>
+
+            <div class="image-overlay-copy">
+              <span>WORSHIP</span>
+              <span>02</span>
+            </div>
           </div>
+
           <div class="story-caption reveal-up">
-            <span class="caption-number">03</span>
-            <span>WORSHIP / CONVERSATION / SERVICE</span>
+
+            <span class="caption-number">
+              03
+            </span>
+
+            <span>
+              WORSHIP / CONVERSATION / SERVICE
+            </span>
+
+            <span class="caption-line"></span>
           </div>
         </div>
       </section>
 
-      <section class="signature section-dark" aria-labelledby="signature-title">
-        <div class="signature-light" aria-hidden="true"></div>
-        <div class="page-width signature-inner">
-          <p class="eyebrow eyebrow-light reveal-up">04 / SIGNATURE MOMENT</p>
-          <div class="signature-words" id="signature-title" aria-label="One faith, many stories, one community">
-            <span class="sig-line reveal-up">ONE FAITH</span>
-            <span class="sig-line serif reveal-up delay-1">MANY STORIES</span>
-            <span class="sig-line reveal-up delay-2">ONE COMMUNITY</span>
+      <!-- ===================================================
+           SIGNATURE MOMENT
+      ==================================================== -->
+
+      <section
+        class="signature section-dark"
+        aria-labelledby="signature-title"
+      >
+        <div
+          class="signature-light"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="signature-light-two"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="signature-grid"
+          aria-hidden="true"
+        ></div>
+
+        <div class="signature-inner page-width">
+
+          <p class="eyebrow eyebrow-light reveal-up">
+            04 / SIGNATURE MOMENT
+          </p>
+
+          <div
+            class="signature-words"
+            id="signature-title"
+            aria-label="One faith, many stories, one community"
+          >
+            <span class="sig-line reveal-up">
+              ONE FAITH
+            </span>
+
+            <span class="sig-line serif reveal-up delay-1">
+              MANY STORIES
+            </span>
+
+            <span class="sig-line reveal-up delay-2">
+              ONE COMMUNITY
+            </span>
           </div>
-          <p class="signature-copy reveal-up delay-3">A community built across backgrounds, generations and experiences — held together by Christ and the calling to walk together.</p>
+
+          <div class="signature-bottom reveal-up delay-3">
+
+            <p class="signature-copy">
+              A community built across backgrounds,
+              generations and experiences — held together
+              by Christ and the calling to walk together.
+            </p>
+
+            <span class="signature-mark">
+              +
+            </span>
+          </div>
         </div>
       </section>
 
-      <section class="location section-cream" id="location" aria-labelledby="location-title">
+      <!-- ===================================================
+           LOCATION
+      ==================================================== -->
+
+      <section
+        class="location section-cream section-surface"
+        id="location"
+        aria-labelledby="location-title"
+      >
         <div class="page-width location-grid">
+
           <div class="location-copy">
-            <p class="eyebrow reveal-up">05 / FIND US</p>
-            <h2 id="location-title" class="display-heading reveal-up delay-1">West Sydney.<br><span>One familiar place.</span></h2>
-            <p class="lead reveal-up delay-2">CSI Church Sydney gathers at 175 Walters Road, Blacktown NSW 2148. Sunday service is listed at 9:00 AM.</p>
+
+            <p class="eyebrow reveal-up">
+              05 / FIND US
+            </p>
+
+            <h2
+              id="location-title"
+              class="display-heading reveal-up delay-1"
+            >
+              West Sydney.
+              <br>
+              <span>One familiar place.</span>
+            </h2>
+
+            <p class="lead reveal-up delay-2">
+              CSI Church Sydney gathers at 175 Walters Road,
+              Blacktown NSW 2148. Sunday service is listed
+              at 9:00 AM.
+            </p>
+
             <div class="address-block reveal-up delay-3">
-              <span class="address-pin" aria-hidden="true">+</span>
+
+              <span
+                class="address-pin"
+                aria-hidden="true"
+              >
+                +
+              </span>
+
               <div>
-                <strong>CSI CHURCH SYDNEY</strong>
-                <p>175 Walters Road<br>Blacktown NSW 2148<br>Australia</p>
+                <strong>
+                  CSI CHURCH SYDNEY
+                </strong>
+
+                <p>
+                  175 Walters Road
+                  <br>
+                  Blacktown NSW 2148
+                  <br>
+                  Australia
+                </p>
               </div>
             </div>
-            <a class="button button-dark magnetic reveal-up delay-3" href="https://www.google.com/maps/dir/?api=1&destination=175+Walters+Road%2C+Blacktown+NSW+2148" target="_blank" rel="noopener">Get directions <span>↗</span></a>
+
+            <a
+              class="button button-dark magnetic reveal-up delay-3"
+              href="https://www.google.com/maps/dir/?api=1&destination=175+Walters+Road%2C+Blacktown+NSW+2148"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-magnetic="0.1"
+            >
+              <span>Get directions</span>
+              <span aria-hidden="true">↗</span>
+            </a>
           </div>
 
-          <div class="location-art" aria-hidden="true">
+          <div
+            class="location-art reveal-scale spotlight-card"
+            aria-label="Stylised location visual for Blacktown, Sydney"
+          >
+            <span class="card-glow"></span>
+
             <div class="map-lines"></div>
+
+            <div class="map-cross map-cross-one"></div>
+            <div class="map-cross map-cross-two"></div>
+
             <div class="map-ring ring-1"></div>
             <div class="map-ring ring-2"></div>
             <div class="map-ring ring-3"></div>
-            <div class="map-marker"><span></span></div>
-            <div class="map-label">BLACKTOWN / NSW</div>
-            <div class="map-coords">33°46′ S&nbsp;&nbsp; 150°54′ E</div>
+
+            <div class="map-marker">
+              <span></span>
+            </div>
+
+            <div class="map-marker-pulse"></div>
+
+            <div class="map-label">
+              BLACKTOWN / NSW
+            </div>
+
+            <div class="map-label-secondary">
+              CSI CHURCH SYDNEY
+            </div>
+
+            <div class="map-coords">
+              33°46′ S&nbsp;&nbsp; 150°54′ E
+            </div>
+
+            <div class="map-route"></div>
           </div>
         </div>
       </section>
 
-      <section class="social section-dark" id="social" aria-labelledby="social-title">
+      <!-- ===================================================
+           SOCIAL
+      ==================================================== -->
+
+      <section
+        class="social section-dark"
+        id="social"
+        aria-labelledby="social-title"
+      >
+        <div class="social-glow" aria-hidden="true"></div>
+
         <div class="page-width social-grid">
+
           <div class="social-copy">
-            <p class="eyebrow eyebrow-light reveal-up">06 / STAY CLOSE</p>
-            <h2 id="social-title" class="display-heading light reveal-up delay-1">Follow the<br><span>journey.</span></h2>
-            <p class="light-copy reveal-up delay-2">The official CSI Church Sydney channels are the verified public social links currently connected from the church website.</p>
+
+            <p class="eyebrow eyebrow-light reveal-up">
+              06 / STAY CLOSE
+            </p>
+
+            <h2
+              id="social-title"
+              class="display-heading light reveal-up delay-1"
+            >
+              Follow the
+              <br>
+              <span>journey.</span>
+            </h2>
+
+            <p class="light-copy reveal-up delay-2">
+              The official CSI Church Sydney channels are the
+              verified public social links currently connected
+              from the church website.
+            </p>
+
             <div class="social-links reveal-up delay-3">
-              <a href="https://www.facebook.com/profile.php?id=100005310645488" target="_blank" rel="noopener" class="social-link">Facebook <span>↗</span></a>
-              <a href="https://www.youtube.com/channel/UCDvzawFMdiN3EP9vLlPzzjg" target="_blank" rel="noopener" class="social-link">YouTube <span>↗</span></a>
+
+              <a
+                href="https://www.facebook.com/profile.php?id=100005310645488"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link magnetic"
+                data-magnetic="0.08"
+              >
+                <span>Facebook</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+
+              <a
+                href="https://www.youtube.com/channel/UCDvzawFMdiN3EP9vLlPzzjg"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link magnetic"
+                data-magnetic="0.08"
+              >
+                <span>YouTube</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+
+            <div class="social-note reveal-up delay-3">
+              <span></span>
+              <small>
+                OFFICIAL CHURCH CHANNELS
+              </small>
             </div>
           </div>
+
           <div class="social-visual reveal-scale">
-            <div class="social-card">
+
+            <a
+              href="https://www.facebook.com/profile.php?id=100005310645488"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-card spotlight-card"
+              aria-label="Visit CSI Church Sydney on Facebook"
+            >
+              <span class="card-glow"></span>
+
               <div class="social-card-top">
-                <span>CSI CHURCH SYDNEY</span>
-                <span>OFFICIAL</span>
+                <span>
+                  CSI CHURCH SYDNEY
+                </span>
+
+                <span>
+                  OFFICIAL
+                </span>
               </div>
+
               <div class="social-card-center">
-                <span class="social-plus">+</span>
-                <span>THAT THEY ALL<br>MAY BE ONE</span>
+                <span class="social-plus">
+                  +
+                </span>
+
+                <span>
+                  THAT THEY ALL
+                  <br>
+                  MAY BE ONE
+                </span>
+
+                <small>
+                  FOLLOW THE JOURNEY ↗
+                </small>
               </div>
+
               <div class="social-card-bottom">
-                <span>BLACKTOWN / SYDNEY</span>
-                <span>CHURCH OF SOUTH INDIA</span>
+                <span>
+                  BLACKTOWN / SYDNEY
+                </span>
+
+                <span>
+                  CHURCH OF SOUTH INDIA
+                </span>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </section>
 
-      <section class="invitation section-cream" aria-labelledby="invite-title">
+      <!-- ===================================================
+           INVITATION
+      ==================================================== -->
+
+      <section
+        class="invitation section-cream section-surface"
+        aria-labelledby="invite-title"
+      >
+        <div class="invitation-radial" aria-hidden="true"></div>
+
         <div class="page-width invitation-inner">
-          <p class="eyebrow reveal-up">07 / YOU'RE INVITED</p>
-          <h2 id="invite-title" class="invitation-title reveal-up delay-1">There is room<br><span>for you here.</span></h2>
-          <p class="invitation-copy reveal-up delay-2">Come as you are. Worship with us, meet the people, and take the next step when you're ready.</p>
+
+          <p class="eyebrow reveal-up">
+            07 / YOU'RE INVITED
+          </p>
+
+          <h2
+            id="invite-title"
+            class="invitation-title reveal-up delay-1"
+          >
+            There is room
+            <br>
+            <span>for you here.</span>
+          </h2>
+
+          <p class="invitation-copy reveal-up delay-2">
+            Come as you are. Worship with us, meet the people,
+            and take the next step when you're ready.
+          </p>
+
           <div class="invitation-actions reveal-up delay-3">
-            <a class="button button-dark magnetic" href="mailto:committee@csichurchsydney.org">Connect with CSI Sydney <span>↗</span></a>
-            <a class="text-link" href="https://www.csichurchsydney.org/" target="_blank" rel="noopener">Visit the official church website <span>↗</span></a>
+
+            <a
+              class="button button-dark magnetic button-large"
+              href="mailto:committee@csichurchsydney.org"
+              data-magnetic="0.1"
+            >
+              <span>
+                Connect with CSI Sydney
+              </span>
+
+              <span aria-hidden="true">
+                ↗
+              </span>
+            </a>
+
+            <a
+              class="text-link text-link-dark"
+              href="https://www.csichurchsydney.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>
+                Visit the official church website
+              </span>
+
+              <span aria-hidden="true">
+                ↗
+              </span>
+            </a>
           </div>
         </div>
       </section>
     </main>
 
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
     <footer class="footer section-dark">
+
       <div class="page-width footer-grid">
-        <div>
-          <div class="footer-brand"><span class="brand-mark" aria-hidden="true">+</span><span>CSI SYDNEY YOUTH</span></div>
-          <p class="footer-motto">THAT THEY ALL MAY BE ONE</p>
+
+        <div class="footer-primary">
+
+          <div class="footer-brand">
+            <span
+              class="brand-mark"
+              aria-hidden="true"
+            >
+              +
+            </span>
+
+            <span>
+              CSI SYDNEY YOUTH
+            </span>
+          </div>
+
+          <p class="footer-motto">
+            THAT THEY ALL MAY BE ONE
+          </p>
+
+          <span class="footer-rule"></span>
         </div>
+
         <div class="footer-address">
-          <p class="eyebrow eyebrow-light">CSI CHURCH SYDNEY</p>
-          <p>175 Walters Road<br>Blacktown NSW 2148<br>Australia</p>
-          <a href="mailto:committee@csichurchsydney.org">committee@csichurchsydney.org</a>
+
+          <p class="eyebrow eyebrow-light">
+            CSI CHURCH SYDNEY
+          </p>
+
+          <p>
+            175 Walters Road
+            <br>
+            Blacktown NSW 2148
+            <br>
+            Australia
+          </p>
+
+          <a href="mailto:committee@csichurchsydney.org">
+            committee@csichurchsydney.org
+          </a>
         </div>
+
         <div class="footer-links">
-          <a href="#top">Back to top <span>↑</span></a>
-          <a href="https://www.csichurchsydney.org/" target="_blank" rel="noopener">Official church <span>↗</span></a>
-          <a href="https://www.youtube.com/channel/UCDvzawFMdiN3EP9vLlPzzjg" target="_blank" rel="noopener">YouTube <span>↗</span></a>
+
+          <a href="#top">
+            <span>Back to top</span>
+            <span aria-hidden="true">↑</span>
+          </a>
+
+          <a
+            href="https://www.csichurchsydney.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Official church</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+
+          <a
+            href="https://www.youtube.com/channel/UCDvzawFMdiN3EP9vLlPzzjg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>YouTube</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
-      <div class="page-width footer-bottom"><span>CSI SYDNEY YOUTH</span><span>© <span id="year"></span> CSI Church Sydney</span></div>
+
+      <div class="page-width footer-bottom">
+
+        <span>
+          CSI SYDNEY YOUTH
+        </span>
+
+        <span>
+          ©
+          <span id="year"></span>
+          CSI CHURCH SYDNEY
+        </span>
+
+        <span>
+          THAT THEY ALL MAY BE ONE
+        </span>
+      </div>
     </footer>
   </div>
 
-  <div class="custom-cursor cursor-dot" aria-hidden="true"></div>
-  <div class="custom-cursor cursor-ring" aria-hidden="true"></div>
+  <!-- =======================================================
+       CURSOR
+  ======================================================== -->
+
+  <div
+    class="custom-cursor cursor-dot"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="custom-cursor cursor-ring"
+    aria-hidden="true"
+  ></div>
 
   <script src="index.js" defer></script>
 </body>
